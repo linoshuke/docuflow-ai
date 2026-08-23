@@ -1,0 +1,27 @@
+INVOICE
+PT MAJU JAYA TEKNIK
+Jl. Gatot Subroto No. 45, Jakarta Selatan
+NPWP: 01.234.567.8-901.000
+
+Nomor Invoice : INV/2026/08/0142
+Tanggal        : 12 Agustus 2026
+Jatuh Tempo    : 26 Agustus 2026
+Kepada         : PT Sumber Rejeki Abadi
+
+=====================================================================
+Deskripsi                                  Qty     Harga       Jumlah
+---------------------------------------------------------------------
+Sparepart mesin produksi tipe GX-200        4    1.250.000  5.000.000
+Jasa perawatan preventif bulanan            1    2.500.000  2.500.000
+Suku cadang hydraulic unit                 12      150.000  1.800.000
+---------------------------------------------------------------------
+Subtotal                                                    9.300.000
+PPN 11%                                                     1.023.000
+TOTAL                                                       10.323.000
+=====================================================================
+
+Pembayaran via transfer ke:
+BCA KCU Jakarta Selatan - 1234567890 a/n PT Maju Jaya Teknik
+
+Kontak: finance@majujaya.co.id | Telp: (021) 555-0142
+Kategori: Pembelian Sparepart & Jasa Teknik
