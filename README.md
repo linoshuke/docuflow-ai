@@ -6,8 +6,12 @@ Dibuat untuk capstone **IBM SkillsBuild University Education X Hacktiv8**.
 
 ## Arsitektur Sistem
 
+DocuFlow AI kini mendukung **1 File Flow Tunggal (Unified Flow)** maupun mode modular:
+
 ```
-FLOW 1 - INGESTION DOKUMEN (DUAL-INPUT MODE)
+========================= UNIFIED SYSTEM CANVAS (1 FILE FLOW) =========================
+
+[ BAGIAN ATAS: PIPELINE INGESTION DOKUMEN (DUAL-INPUT) ]
 [ Upload Dokumen (PDF/TXT) ] ----+
                                  |---> [ DocuFlow Ingestion Gateway ] ---> [ Structured Output ] ---> [ DocuFlow SQL Writer ]
 [ Input Chat Langsung (Tanpa PDF) ]+                                           ^                             |
@@ -16,23 +20,33 @@ FLOW 1 - INGESTION DOKUMEN (DUAL-INPUT MODE)
                                                                                                     (documents + items)
                                                                                                              |
                                                                                                              v
-                                                                                                    [ Chat Output ]
+                                                                                                    [ Chat Output Ingest ]
 
-FLOW 2 - QUERY CHAT DATABASE
-Pertanyaan Pengguna -> DocuFlow SQL Guard / SQLite Reader
-                               |
-                               v
-           Query SQL Aman / Agregat Dokumen + Rincian Barang
-                               |
-                               v
-                     LLM (Jawaban Bahasa Indonesia) -> Chat Output
+----------------------------------------------------------------------------------------
+
+[ BAGIAN BAWAH: PIPELINE QUERY CHAT DATABASE ]
+[ Chat Input Pertanyaan ] ---> [ Prompt Generator SQL ] ---> [ LLM Pembuat SQL ]
+                                                                     |
+                                                                     v
+                                                            [ DocuFlow SQL Guard ]
+                                                                     |
+                                                                     v
+                                                          [ DocuFlow SQLite Database ]
+                                                                     | (Query Result)
+                                                                     v
+                                                          [ Prompt Perangkum Jawaban ] <--- (User Question & SQL)
+                                                                     |
+                                                                     v
+                                                           [ LLM Formatter Jawaban ] ---> [ Chat Output Jawaban ]
+========================================================================================
 ```
 
 ### Keunggulan Alur Perbaikan (Solusi Kelabilan Lingkungan Langflow)
-1. **Tidak Wajib Punya PDF Jadi (Dual-Input Ingestion Gateway):** Pengguna tidak lagi dipaksa harus mengunggah file PDF/dokumen fisik. Pengguna dapat langsung **mengetik atau menempelkan teks transaksi/nota kas kecil di Playground chat**. Komponen `DocuFlowInputGateway` akan otomatis mendeteksi sumber data (file upload atau teks chat langsung).1
-2. **Dukungan Rincian Barang Relasional (1-to-Many Line Items):** Menyimpan data ke dua tabel terhubung: `documents` (header tagihan) dan `document_items` (rincian nama barang, kuantitas, harga satuan, dan subtotal).
-3. **De-duplikasi Cerdas & Toleran:** Memeriksa duplikasi dengan normalisasi vendor dan nomor dokumen, serta tidak menolak kwitansi yang tidak memiliki nomor kwitansi selama tanggal/nominal berbeda.
-4. **Portabilitas Lintas Platform:** Bebas dari *hardcoded path* Windows `C:\Users\ASUS\...`. Komponen otomatis mendeteksi direktori database relatif (`data/docuflow.db`) atau variabel lingkungan `DOCUFLOW_DB_PATH`.
+1. **Satu File Flow Terpadu (Unified 1-File Flow):** Cukup **1 kali import** file `Docuflow - Unified System.json`. Pengguna dan penguji tidak perlu repot berpindah antar file `.json`. Seluruh arsitektur (Ingestion + Query) terorganisasi rapi dan berdampingan di satu canvas.
+2. **Tidak Wajib Punya PDF Jadi (Dual-Input Ingestion Gateway):** Pengguna tidak lagi dipaksa harus mengunggah file PDF/dokumen fisik. Pengguna dapat langsung **mengetik atau menempelkan teks transaksi/nota kas kecil di Playground chat**. Komponen `DocuFlowInputGateway` otomatis mendeteksi sumber data (file upload atau teks chat langsung).
+3. **Dukungan Rincian Barang Relasional (1-to-Many Line Items):** Menyimpan data ke dua tabel terhubung: `documents` (header tagihan) dan `document_items` (rincian nama barang, kuantitas, harga satuan, dan subtotal).
+4. **De-duplikasi Cerdas & Toleran:** Memeriksa duplikasi dengan normalisasi vendor dan nomor dokumen, serta tidak menolak kwitansi yang tidak memiliki nomor kwitansi selama tanggal/nominal berbeda.
+5. **Portabilitas Lintas Platform:** Bebas dari *hardcoded path* Windows `C:\Users\ASUS\...`. Komponen otomatis mendeteksi direktori database relatif (`data/docuflow.db`) atau variabel lingkungan `DOCUFLOW_DB_PATH`.
 
 ---
 
@@ -41,10 +55,12 @@ Pertanyaan Pengguna -> DocuFlow SQL Guard / SQLite Reader
 ```
 docuflow-ai/
 ├── flows/
-│   ├── Docuflow 1 - Ingestion Dokumen.json     Flow Ingestion (Dual-Input + Line Items)
-│   ├── Docuflow Query - Chat Database.json     Flow Query (Tanya Database + Rincian Item)
-│   ├── docuflow_1.json                         Salinan flow 1 hasil regenerasi
-│   └── docuflow_2.json                         Salinan flow 2 hasil regenerasi
+│   ├── Docuflow - Unified System.json          ★ FLOW UTAMA TERPADU (1 FILE GABUNGAN)
+│   ├── docuflow_unified.json                   Salinan flow terpadu hasil regenerasi
+│   ├── Docuflow 1 - Ingestion Dokumen.json     Flow Modular 1: Ingestion
+│   ├── Docuflow Query - Chat Database.json     Flow Modular 2: Query Database
+│   ├── docuflow_1.json                         Salinan flow 1
+│   └── docuflow_2.json                         Salinan flow 2
 ├── components/
 │   ├── input_gateway.py       Komponen Gateway (File Upload ATAU Chat Langsung)
 │   ├── sqlite_writer.py       Komponen Writer (Validasi + Relasi document_items)
@@ -90,38 +106,38 @@ docuflow-ai/
 ## Cara Menjalankan di Langflow
 
 ### 1. Sinkronisasi & Import Otomatis (Opsional)
-Jika Langflow sedang berjalan di komputer lokal (`http://127.0.0.1:7860`), Anda dapat menjalankan:
+Jika Langflow sedang berjalan di komputer lokal (`http://127.0.0.1:7860`), Anda cukup menjalankan:
 ```bash
 python tools/build_flows.py
 ```
-Script akan otomatis membangun flow dengan komponen terbaru dan mengimpornya langsung ke instance Langflow Anda.
+Script akan otomatis membangun seluruh file flow terbaru dan mengimpornya langsung ke dashboard Langflow Anda:
+1. `DocuFlow AI - Unified System` (1 File Flow Terpadu)
+2. `DocuFlow 1 - Ingestion Dokumen` (Modular)
+3. `DocuFlow 2 - Query Database` (Modular)
 
-Atau impor manual melalui UI Langflow:
-- Buka Langflow > **New Flow** > **Import** > pilih file dari folder `flows/`.
-
----
-
-### 2. Ingestion (Dua Cara Penggunaan)
-
-Buka flow **DocuFlow 1 - Ingestion Dokumen**, lalu buka **Playground**:
-
-#### Cara A: Jika Punya File Dokumen (PDF / TXT)
-1. Unggah file dokumen di node **Upload Dokumen**.
-2. Ketik `proses` di chat Playground lalu tekan Enter.
-3. Dokumen akan diekstrak dan disimpan ke SQLite lengkap dengan rincian barangnya.
-
-#### Cara B: Tanpa File Dokumen (Input Langsung via Chat Playground)
-Pengguna **tidak perlu membuat atau mengupload PDF**. Cukup ketik rincian transaksi langsung di chat Playground, misalnya:
-> *"Telah dibayar kwitansi Toko Berkah No 908 tanggal 10 Oktober 2026. Pembelian 5 pcs lampu LED @ Rp35.000 (total 175.000) dan kabel roll 10m Rp50.000. Total dibayar Rp225.000. Kategori: Perlengkapan Kantor."*
-
-Gateway akan mendeteksi teks chat tersebut, LLM mengekstrak datanya menjadi JSON terstruktur, dan SQL Writer menyimpannya langsung ke database SQLite.
+Atau jika ingin impor manual melalui UI Langflow:
+- Buka Langflow > **New Flow** > **Import** > pilih file [`Docuflow - Unified System.json`](file:///c:/Users/ASUS/docuflow-ai/flows/Docuflow%20-%20Unified%20System.json) dari folder `flows/`.
 
 ---
 
-### 3. Query (Tanya Database)
+### 2. Menggunakan Unified Flow (1 File Terpadu)
 
-Buka flow **DocuFlow 2 - Query Database**, lalu buka **Playground**:
-Contoh pertanyaan yang didukung:
+Pada flow **DocuFlow AI - Unified System**, seluruh arsitektur ditampilkan dalam satu canvas terpadu:
+- **Bagian Atas (`[Ingestion] ...`)**: Pipeline ekstraksi dan penyimpanan dokumen/nota ke SQLite.
+- **Bagian Bawah (`[Query] ...`)**: Pipeline tanya-jawab natural language atas database SQLite.
+
+#### A. Ingestion Dokumen (Upload PDF atau Ketik di Chat)
+1. **Opsi 1 (Ada File Fisik):** Unggah invoice/kwitansi (PDF/TXT) pada node `[Ingestion] Upload Dokumen (PDF/TXT)`.
+2. **Opsi 2 (Tanpa File Fisik / Nota Cepat):** Ketik rincian nota langsung di input `[Ingestion] Input Teks Nota / Chat Langsung`, contoh:
+   > *"Kwitansi Toko Berkah No 908 tanggal 10 Oktober 2026. Pembelian 5 pcs lampu LED @ Rp35.000 dan kabel roll 10m Rp50.000. Total Rp225.000. Kategori: Perlengkapan Kantor."*
+3. Jalankan node/pipeline Ingestion. Dokumen otomatis tersimpan ke `data/docuflow.db` lengkap dengan tabel rincian barang.
+
+#### B. Query / Tanya Database
+Ketik pertanyaan di node `[Query] Chat Input Pertanyaan`, contoh:
+- *"Berapa total pengeluaran yang tercatat?"*
+- *"Tampilkan daftar barang yang dibeli dari PT Maju Jaya"*
+- *"Kategori apa yang paling banyak pengeluarannya?"*
+LLM akan membuat query SQL aman, mengeksekusinya ke database, dan merangkum jawabannya secara otomatis.
 * *"Berapa total seluruh pengeluaran yang tercatat di database?"*
 * *"Siapa saja vendor yang pernah kita bayar?"*
 * *"Berapa unit sparepart mesin GX-200 yang dibeli dan berapa total harganya?"*

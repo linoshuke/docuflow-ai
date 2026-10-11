@@ -7,6 +7,7 @@ import urllib.request
 import urllib.error
 
 import os
+from typing import Any, TypedDict
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DB_FILE = os.path.join(PROJECT_ROOT, "data", "docuflow.db")
@@ -562,6 +563,51 @@ def build_query(comps):
     return nodes, edges
 
 
+def build_unified(comps):
+    ingest_nodes, ingest_edges = build_ingestion(comps)
+    query_nodes, query_edges = build_query(comps)
+
+    for n in ingest_nodes:
+        dname = n["data"]["node"]["display_name"]
+        if not dname.startswith("[Ingestion]"):
+            n["data"]["node"]["display_name"] = f"[Ingestion] {dname}"
+            n["data"]["display_name"] = f"[Ingestion] {dname}"
+
+    pos_map = {
+        "ChatInput-query": (40, 800),
+        "Prompt-sqlgen": (400, 800),
+        "LLM-sqlgen-2": (760, 800),
+        "SQLGuard-clean": (1120, 800),
+        "SQLDatabase-docuflow": (1480, 800),
+        "Prompt-answer": (580, 1150),
+        "LLM-answer-3": (940, 1150),
+        "ChatOutput-answer": (1300, 1150),
+    }
+
+    for n in query_nodes:
+        nid = n["id"]
+        if nid in pos_map:
+            n["position"] = {"x": pos_map[nid][0], "y": pos_map[nid][1]}
+            n["positionAbsolute"] = {"x": pos_map[nid][0], "y": pos_map[nid][1]}
+        dname = n["data"]["node"]["display_name"]
+        if not dname.startswith("[Query]"):
+            n["data"]["node"]["display_name"] = f"[Query] {dname}"
+            n["data"]["display_name"] = f"[Query] {dname}"
+
+    unified_nodes = ingest_nodes + query_nodes
+    unified_edges = ingest_edges + query_edges
+    return unified_nodes, unified_edges
+
+
+class FlowConfig(TypedDict):
+    name: str
+    desc: str
+    data: tuple[list[dict[str, Any]], list[dict[str, Any]]]
+    files: list[str]
+    endpoint: str
+    icon_bg: str
+
+
 def main():
     print("[1/5] Login ke Langflow...")
     token = login()
@@ -581,34 +627,61 @@ def main():
                 urllib.request.urlopen(req, timeout=30)
                 print(f"      Dihapus: {f.get('name')}")
 
-    flows = [
-        ("DocuFlow 1 - Ingestion Dokumen", "Upload invoice/kwitansi -> ekstraksi LLM -> validasi -> simpan ke SQLite",
-         build_ingestion(comps)),
-        ("DocuFlow 2 - Query Database", "Tanya-jawab natural language ke database dokumen",
-         build_query(comps)),
+    flow_configs: list[FlowConfig] = [
+        {
+            "name": "DocuFlow AI - Unified System",
+            "desc": "Sistem Terpadu DocuFlow AI dalam 1 Flow: Ingestion Dokumen (Dual-Input) + Query Database Terintegrasi",
+            "data": build_unified(comps),
+            "files": ["Docuflow - Unified System.json", "docuflow_unified.json"],
+            "endpoint": "docuflow-unified",
+            "icon_bg": "#3b82f6",
+        },
+        {
+            "name": "DocuFlow 1 - Ingestion Dokumen",
+            "desc": "Upload invoice/kwitansi -> ekstraksi LLM -> validasi -> simpan ke SQLite",
+            "data": build_ingestion(comps),
+            "files": ["Docuflow 1 - Ingestion Dokumen.json", "docuflow_1.json"],
+            "endpoint": "docuflow-ingestion",
+            "icon_bg": "#dbeafe",
+        },
+        {
+            "name": "DocuFlow 2 - Query Database",
+            "desc": "Tanya-jawab natural language ke database dokumen",
+            "data": build_query(comps),
+            "files": ["Docuflow Query - Chat Database.json", "docuflow_2.json"],
+            "endpoint": "docuflow-query",
+            "icon_bg": "#dbeafe",
+        },
     ]
 
-    for i, (name, desc, (nodes, edges)) in enumerate(flows, 1):
+    for item in flow_configs:
+        nodes, edges = item["data"]
         flow_json = {
-            "name": name,
-            "description": desc,
+            "name": item["name"],
+            "description": item["desc"],
             "icon": "workflow",
-            "icon_bg_color": "#dbeafe",
+            "icon_bg_color": item["icon_bg"],
             "is_component": False,
-            "data": {"nodes": nodes, "edges": edges, "viewport": {"zoom": 0.6,
-                                                                  "x": 20, "y": 20}},
+            "data": {
+                "nodes": nodes,
+                "edges": edges,
+                "viewport": {"zoom": 0.55, "x": 20, "y": 20},
+            },
         }
-        path = os.path.join(PROJECT_ROOT, "flows", f"docuflow_{i}.json")
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(flow_json, f, ensure_ascii=False, indent=2)
-        print(f"[4/5] Disimpan: {path}")
+
+        for fname in item["files"]:
+            path = os.path.join(PROJECT_ROOT, "flows", fname)
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(flow_json, f, ensure_ascii=False, indent=2)
+            print(f"[4/5] Disimpan file: {fname}")
+
         try:
             created = api("/api/v1/flows/", flow_json, token=token)
             if not created or not isinstance(created, dict):
                 raise RuntimeError("API tidak mengembalikan objek flow yang valid")
 
             print(f"      Import OK -> id={created['id']} name={created['name']}")
-            patch = {"endpoint_name": "docuflow-ingestion" if i == 1 else "docuflow-query"}
+            patch = {"endpoint_name": item["endpoint"]}
             req = urllib.request.Request(
                 BASE + "/api/v1/flows/" + str(created["id"]),
                 data=json.dumps(patch).encode(),
@@ -618,17 +691,10 @@ def main():
             urllib.request.urlopen(req, timeout=30)
             print(f"      endpoint_name -> {patch['endpoint_name']}")
         except Exception as exc:
-            print(f"      Import GAGAL: {exc}")
-            err_body = ""
-            try:
-                req = urllib.request.Request(
-                    BASE + "/api/v1/flows/",
-                    data=json.dumps(flow_json).encode(),
-                    headers={"Content-Type": "application/json",
-                             "Authorization": "Bearer " + token})
-                urllib.request.urlopen(req, timeout=60)
-            except urllib.error.HTTPError as he:
-                err_body = he.read().decode()[:2000]
-            if err_body:
-                print("      Detail:", err_body)
-    print("[5/5] Selesai.")
+            print(f"      Import GAGAL untuk {item['name']}: {exc}")
+
+    print("[5/5] Selesai. Seluruh flow (termasuk Unified Flow 1-file) berhasil dibangun dan di-import!")
+
+
+if __name__ == "__main__":
+    main()
