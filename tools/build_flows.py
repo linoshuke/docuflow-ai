@@ -1,15 +1,19 @@
-﻿"""Build DocuFlow AI Langflow flows and import them to a running Langflow instance."""
+"""Build DocuFlow AI Langflow flows and import them to a running Langflow instance."""
 import copy
 import json
 import sys
 import urllib.parse
 import urllib.request
+import urllib.error
+
+import os
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DB_FILE = os.path.join(PROJECT_ROOT, "data", "docuflow.db")
+DB_URL = f"sqlite:///{DB_FILE.replace(os.sep, '/')}"
 
 BASE = "http://127.0.0.1:7860"
 USER, PASS = "langflow", "langflow"
-DB_URL = "sqlite:///C:/Users/ASUS/docuflow-ai/data/docuflow.db"
-
-import os
 
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
@@ -22,7 +26,9 @@ EXTRACTION_SYSTEM_PROMPT = (
     "(2) Ubah nilai uang seperti 'Rp 10.323.000' atau 'Rp4.000.000' menjadi angka biasa tanpa titik/koma (misal 10323000). "
     "(3) doc_type harus salah satu dari: invoice, receipt, quotation, purchase_order, form, other. "
     "(4) currency gunakan kode ISO 4217, misalnya IDR. "
-    "(5) Jika sebuah field tidak ditemukan di dokumen, isi null. Jangan pernah mengarang data yang tidak ada di dokumen. "
+    "(5) Ekstrak seluruh rincian item barang/jasa ke dalam field 'items' sebagai JSON array string yang memuat objek: "
+    "[{\"item_name\": \"...\", \"quantity\": 1, \"unit_price\": 1000, \"total_price\": 1000}]. "
+    "(6) Jika sebuah field tidak ditemukan di dokumen, isi null. Jangan pernah mengarang data yang tidak ada di dokumen. "
     "Kembalikan SEMUA objek dokumen yang ditemukan."
 )
 
@@ -47,35 +53,41 @@ SCHEMA_ROWS = [
      "multiple": False, "name": "currency", "type": "str"},
     {"description": "Kategori transaksi, misal Pembelian Sparepart",
      "multiple": False, "name": "category", "type": "str"},
+    {"description": "Daftar rincian barang/jasa dalam format JSON array yang berisi item_name, quantity, unit_price, total_price",
+     "multiple": False, "name": "items", "type": "str"},
 ]
 
-SQL_GEN_TEMPLATE = """Kamu adalah ahli database SQLite. Berikut skema tabel `documents`:
+SQL_GEN_TEMPLATE = """Kamu adalah ahli database SQLite. Berikut skema tabel DocuFlow AI:
 
 CREATE TABLE documents (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  doc_type TEXT,
-  vendor TEXT,
-  document_number TEXT,
-  document_date TEXT,
-  description TEXT,
-  subtotal REAL,
-  tax REAL,
-  total_amount REAL,
-  currency TEXT,
-  category TEXT,
-  warnings TEXT,
-  raw_json TEXT,
+  doc_type TEXT, vendor TEXT, document_number TEXT,
+  document_date TEXT, description TEXT,
+  subtotal REAL, tax REAL, total_amount REAL,
+  currency TEXT, category TEXT,
+  warnings TEXT, raw_json TEXT,
   created_at TEXT
-)
+);
+
+CREATE TABLE document_items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  document_id INTEGER,
+  item_name TEXT,
+  quantity REAL,
+  unit_price REAL,
+  total_price REAL,
+  created_at TEXT,
+  FOREIGN KEY (document_id) REFERENCES documents (id)
+);
 
 Pertanyaan pengguna: {user_question}
 
 Tulis SATU query SQLite SELECT yang menjawab pertanyaan tersebut.
 ATURAN WAJIB:
-- Hanya gunakan tabel documents.
-- Kolom document_date berformat teks YYYY-MM-DD; untuk filter bulan gunakan strftime('%Y-%m', document_date), contoh: strftime('%Y-%m', document_date) = '2026-08'.
-- Kolom subtotal, tax, total_amount sudah berupa angka.
-- Untuk pencarian teks gunakan LIKE dengan huruf besar/kecil bebas.
+- Jika pertanyaan menanyakan rincian barang, kuantitas, harga satuan, atau pembelian spesifik, gunakan JOIN antara documents dan document_items (ON documents.id = document_items.document_id).
+- Kolom document_date berformat teks YYYY-MM-DD; untuk filter bulan gunakan strftime('%Y-%m', document_date) = 'YYYY-MM' atau LIKE 'YYYY-MM%'.
+- Untuk total pengeluaran gunakan SUM(total_amount) dari tabel documents.
+- Untuk pencarian teks gunakan LIKE '%kata%' dengan case-insensitive.
 - Keluarkan HANYA satu query SQL, tanpa penjelasan, tanpa blok markdown, tanpa titik koma di akhir."""
 
 ANSWER_TEMPLATE = """Pengguna bertanya: {user_question}
@@ -261,8 +273,11 @@ def make_llm_node(comps, node_id, x, y):
     })
 
 
-WRITER_CODE = open(r"C:\Users\ASUS\docuflow-ai\components\sqlite_writer.py",
-                   encoding="utf-8").read()
+WRITER_PATH = os.path.join(PROJECT_ROOT, "components", "sqlite_writer.py")
+WRITER_CODE = open(WRITER_PATH, encoding="utf-8").read()
+
+GATEWAY_PATH = os.path.join(PROJECT_ROOT, "components", "input_gateway.py")
+GATEWAY_CODE = open(GATEWAY_PATH, encoding="utf-8").read()
 
 SANITIZER_CODE = '''import re
 
@@ -379,20 +394,44 @@ def prompt_dynamic_field(display):
 
 def build_ingestion(comps):
     file_c = find_comp(comps, "File")
+    chatin_c = find_comp(comps, "ChatInput")
     so_c = find_comp(comps, "StructuredOutput")
     chatout_c = find_comp(comps, "ChatOutput")
 
-    n_file = make_node("File-docuflow", "File", file_c, 60, 200,
-                       display_name="Upload Dokumen")
+    n_file = make_node("File-docuflow", "File", file_c, 40, 100,
+                       display_name="Upload Dokumen (PDF/TXT)")
+    n_chatin = make_node("ChatInput-ingest", "ChatInput", chatin_c, 40, 360,
+                         display_name="Input Teks Nota / Chat Langsung")
 
-    n_wx1 = make_llm_node(comps, "LLM-extract-1", 60, 480)
+    gateway_outputs = [{
+        "allows_loop": False, "cache": True, "display_name": "Teks Siap Ekstraksi",
+        "group_outputs": False, "method": "process_input", "name": "output_text",
+        "selected": "Message", "tool_mode": True, "types": ["Message"],
+        "value": "__UNDEFINED__",
+    }]
+    n_gateway = make_node(
+        "Gateway-ingest", "DocuFlowInputGateway", {}, 420, 180,
+        display_name="DocuFlow Ingestion Gateway",
+        outputs_override=gateway_outputs,
+        base_classes_override=["Message"],
+        code_value=GATEWAY_CODE,
+        template_extra={
+            "file_message": build_field("file_message", ["Message", "Data", "Text"],
+                                        display="File Dokumen (PDF/TXT)", required=False),
+            "chat_message": build_field("chat_message", ["Message", "Text"],
+                                        display="Teks Chat / Nota Langsung", required=False),
+            "fallback_text": message_field("fallback_text", "", "Teks Cadangan", advanced=True),
+        },
+    )
+
+    n_wx1 = make_llm_node(comps, "LLM-extract-1", 420, 520)
 
     so_template_extra = {
         "system_prompt": message_field("system_prompt", EXTRACTION_SYSTEM_PROMPT,
                                        "System Prompt"),
         "schema_name": message_field("schema_name", "docuflow_extraction", "Schema Name"),
     }
-    n_so = make_node("StructuredOutput-extract", "StructuredOutput", so_c, 420, 180,
+    n_so = make_node("StructuredOutput-extract", "StructuredOutput", so_c, 780, 180,
                      template_extra=so_template_extra)
     n_so["data"]["node"]["template"]["output_schema"]["value"] = copy.deepcopy(SCHEMA_ROWS)
 
@@ -403,7 +442,7 @@ def build_ingestion(comps):
         "value": "__UNDEFINED__",
     }]
     n_writer = make_node(
-        "SQLiteWriter-save", "SQLiteDocuFlowWriter", {}, 800, 180,
+        "SQLiteWriter-save", "SQLiteDocuFlowWriter", {}, 1140, 180,
         display_name="DocuFlow SQLite Writer",
         outputs_override=writer_outputs,
         base_classes_override=["Message"],
@@ -412,18 +451,24 @@ def build_ingestion(comps):
             "rows": build_field("rows", ["DataFrame", "Table", "Data", "JSON"],
                                 display="Hasil Ekstraksi"),
             "db_path": message_field("db_path",
-                                     r"C:\Users\ASUS\docuflow-ai\data\docuflow.db",
+                                     DB_FILE,
                                      "Path Database SQLite", advanced=True),
         },
     )
     n_writer["data"]["node"]["template"]["db_path"]["multiline"] = False
     n_writer["data"]["node"]["template"]["db_path"]["_input_type"] = "MessageTextInput"
 
-    n_out = make_node("ChatOutput-ingest", "ChatOutput", chatout_c, 1160, 190)
+    n_out = make_node("ChatOutput-ingest", "ChatOutput", chatout_c, 1500, 190)
 
-    nodes = [n_file, n_wx1, n_so, n_writer, n_out]
+    nodes = [n_file, n_chatin, n_gateway, n_wx1, n_so, n_writer, n_out]
     edges = [
         make_edge("File-docuflow", "File", "message", ["Message"],
+                  "Gateway-ingest", "DocuFlowInputGateway", "file_message",
+                  ["Message", "Data", "Text"], "other"),
+        make_edge("ChatInput-ingest", "ChatInput", "message", ["Message"],
+                  "Gateway-ingest", "DocuFlowInputGateway", "chat_message",
+                  ["Message", "Text"], "other"),
+        make_edge("Gateway-ingest", "DocuFlowInputGateway", "output_text", ["Message"],
                   "StructuredOutput-extract", "StructuredOutput", "input_value",
                   ["Message", "Text"], "str"),
         make_edge("LLM-extract-1", "OpenAIModel", "model_output", ["LanguageModel"],
@@ -524,15 +569,17 @@ def main():
     comps = get_components(token)
 
     print("[3/5] Menghapus flow DocuFlow lama (jika ada)...")
-    existing = api("/api/v1/flows/", token=token)
+    existing = api("/api/v1/flows/", token=token) or []
     for f in existing:
-        if f.get("name", "").startswith("DocuFlow"):
-            req = urllib.request.Request(
-                BASE + "/api/v1/flows/" + f["id"],
-                headers={"Authorization": "Bearer " + token},
-                method="DELETE")
-            urllib.request.urlopen(req, timeout=30)
-            print(f"      Dihapus: {f['name']}")
+        if isinstance(f, dict) and f.get("name", "").startswith("DocuFlow"):
+            flow_id = f.get("id")
+            if flow_id:
+                req = urllib.request.Request(
+                    BASE + "/api/v1/flows/" + str(flow_id),
+                    headers={"Authorization": "Bearer " + token},
+                    method="DELETE")
+                urllib.request.urlopen(req, timeout=30)
+                print(f"      Dihapus: {f.get('name')}")
 
     flows = [
         ("DocuFlow 1 - Ingestion Dokumen", "Upload invoice/kwitansi -> ekstraksi LLM -> validasi -> simpan ke SQLite",
@@ -551,16 +598,19 @@ def main():
             "data": {"nodes": nodes, "edges": edges, "viewport": {"zoom": 0.6,
                                                                   "x": 20, "y": 20}},
         }
-        path = rf"C:\Users\ASUS\docuflow-ai\flows\docuflow_{i}.json"
+        path = os.path.join(PROJECT_ROOT, "flows", f"docuflow_{i}.json")
         with open(path, "w", encoding="utf-8") as f:
             json.dump(flow_json, f, ensure_ascii=False, indent=2)
         print(f"[4/5] Disimpan: {path}")
         try:
             created = api("/api/v1/flows/", flow_json, token=token)
+            if not created or not isinstance(created, dict):
+                raise RuntimeError("API tidak mengembalikan objek flow yang valid")
+
             print(f"      Import OK -> id={created['id']} name={created['name']}")
             patch = {"endpoint_name": "docuflow-ingestion" if i == 1 else "docuflow-query"}
             req = urllib.request.Request(
-                BASE + "/api/v1/flows/" + created["id"],
+                BASE + "/api/v1/flows/" + str(created["id"]),
                 data=json.dumps(patch).encode(),
                 headers={"Content-Type": "application/json",
                          "Authorization": "Bearer " + token},
@@ -582,8 +632,3 @@ def main():
             if err_body:
                 print("      Detail:", err_body)
     print("[5/5] Selesai.")
-
-
-if __name__ == "__main__":
-    sys.exit(main())
-

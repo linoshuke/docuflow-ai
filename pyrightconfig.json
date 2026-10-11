@@ -1,0 +1,8 @@
+{
+  "venvPath": "C:\\Users\\ASUS\\AppData\\Local\\com.LangflowDesktop",
+  "venv": ".langflow-venv",
+  "extraPaths": [
+    "C:\\Users\\ASUS\\AppData\\Local\\com.LangflowDesktop\\.langflow-venv\\Lib\\site-packages"
+  ],
+  "reportMissingImports": "none"
+}

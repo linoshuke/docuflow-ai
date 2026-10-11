@@ -1,99 +1,35 @@
 {
+  "name": "DocuFlow 1 - Ingestion Dokumen",
+  "description": "Upload invoice/kwitansi -> ekstraksi LLM -> validasi -> simpan ke SQLite",
+  "icon": "workflow",
+  "icon_bg_color": "#dbeafe",
+  "is_component": false,
   "data": {
-    "edges": [
-      {
-        "animated": false,
-        "className": "",
-        "data": {
-          "sourceHandle": {
-            "dataType": "File",
-            "id": "File-GXz29",
-            "name": "message",
-            "output_types": [
-              "Message"
-            ]
-          },
-          "targetHandle": {
-            "fieldName": "input_value",
-            "id": "StructuredOutput-qhWw7",
-            "inputTypes": [
-              "Message"
-            ],
-            "type": "str"
-          }
-        },
-        "id": "xy-edge__File-GXz29{œdataTypeœ:œFileœ,œidœ:œFile-GXz29œ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-StructuredOutput-qhWw7{œfieldNameœ:œinput_valueœ,œidœ:œStructuredOutput-qhWw7œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
-        "selected": false,
-        "source": "File-GXz29",
-        "sourceHandle": "{œdataTypeœ:œFileœ,œidœ:œFile-GXz29œ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "StructuredOutput-qhWw7",
-        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œStructuredOutput-qhWw7œ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
-      },
-      {
-        "animated": false,
-        "className": "",
-        "data": {
-          "sourceHandle": {
-            "dataType": "CustomComponent",
-            "id": "CustomComponent-OiyNZ",
-            "name": "output",
-            "output_types": [
-              "JSON"
-            ]
-          },
-          "targetHandle": {
-            "fieldName": "input_value",
-            "id": "ChatOutput-5SSbb",
-            "inputTypes": [
-              "Data",
-              "JSON",
-              "DataFrame",
-              "Table",
-              "Message"
-            ],
-            "type": "other"
-          }
-        },
-        "id": "xy-edge__CustomComponent-OiyNZ{œdataTypeœ:œCustomComponentœ,œidœ:œCustomComponent-OiyNZœ,œnameœ:œoutputœ,œoutput_typesœ:[œJSONœ]}-ChatOutput-5SSbb{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-5SSbbœ,œinputTypesœ:[œDataœ,œJSONœ,œDataFrameœ,œTableœ,œMessageœ],œtypeœ:œotherœ}",
-        "selected": false,
-        "source": "CustomComponent-OiyNZ",
-        "sourceHandle": "{œdataTypeœ:œCustomComponentœ,œidœ:œCustomComponent-OiyNZœ,œnameœ:œoutputœ,œoutput_typesœ:[œJSONœ]}",
-        "target": "ChatOutput-5SSbb",
-        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-5SSbbœ,œinputTypesœ:[œDataœ,œJSONœ,œDataFrameœ,œTableœ,œMessageœ],œtypeœ:œotherœ}"
-      },
-      {
-        "animated": false,
-        "className": "",
-        "data": {
-          "sourceHandle": {
-            "dataType": "Prompt Template",
-            "id": "Prompt Template-jUGvg",
-            "name": "prompt",
-            "output_types": [
-              "Message"
-            ]
-          },
-          "targetHandle": {
-            "fieldName": "input_value",
-            "id": "CustomComponent-OiyNZ",
-            "inputTypes": [
-              "Message"
-            ],
-            "type": "str"
-          }
-        },
-        "id": "xy-edge__Prompt Template-jUGvg{œdataTypeœ:œPrompt Templateœ,œidœ:œPrompt Template-jUGvgœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}-CustomComponent-OiyNZ{œfieldNameœ:œinput_valueœ,œidœ:œCustomComponent-OiyNZœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
-        "selected": false,
-        "source": "Prompt Template-jUGvg",
-        "sourceHandle": "{œdataTypeœ:œPrompt Templateœ,œidœ:œPrompt Template-jUGvgœ,œnameœ:œpromptœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "CustomComponent-OiyNZ",
-        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œCustomComponent-OiyNZœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
-      }
-    ],
     "nodes": [
       {
+        "id": "File-docuflow",
+        "type": "genericNode",
+        "position": {
+          "x": 40,
+          "y": 100
+        },
+        "positionAbsolute": {
+          "x": 40,
+          "y": 100
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "height": 250,
+          "width": 320
+        },
         "data": {
-          "id": "File-GXz29",
+          "id": "File-docuflow",
+          "type": "File",
+          "op_version": "main",
+          "showOutput": true,
+          "description": "Loads and returns the content from uploaded files.",
+          "display_name": "Upload Dokumen (PDF/TXT)",
           "node": {
             "base_classes": [
               "Message"
@@ -102,7 +38,7 @@
             "conditional_paths": [],
             "custom_fields": {},
             "description": "Loads and returns the content from uploaded files.",
-            "display_name": "Upload Dokumen",
+            "display_name": "Upload Dokumen (PDF/TXT)",
             "documentation": "https://docs.langflow.org/read-file",
             "edited": false,
             "field_order": [
@@ -134,34 +70,8 @@
             ],
             "frozen": false,
             "icon": "file-text",
-            "last_updated": "2026-08-23T07:34:37.711Z",
             "legacy": false,
-            "metadata": {
-              "code_hash": "c20646f04f8e",
-              "dependencies": {
-                "dependencies": [
-                  {
-                    "name": "lfx",
-                    "version": null
-                  },
-                  {
-                    "name": "langchain_core",
-                    "version": "1.3.2"
-                  },
-                  {
-                    "name": "pydantic",
-                    "version": "2.12.5"
-                  },
-                  {
-                    "name": "googleapiclient",
-                    "version": "2.194.0"
-                  }
-                ],
-                "total_dependencies": 4
-              },
-              "module": "lfx.components.files_and_knowledge.file.FileComponent"
-            },
-            "minimized": false,
+            "lf_version": "1.9.2",
             "output_types": [],
             "outputs": [
               {
@@ -169,11 +79,8 @@
                 "cache": true,
                 "display_name": "Raw Content",
                 "group_outputs": false,
-                "loop_types": null,
                 "method": "load_files_message",
                 "name": "message",
-                "options": null,
-                "required_inputs": null,
                 "selected": "Message",
                 "tool_mode": true,
                 "types": [
@@ -184,12 +91,6 @@
             ],
             "pinned": false,
             "template": {
-              "_frontend_node_flow_id": {
-                "value": "20a3e812-b1bc-4604-a4dc-c707cb8e2c2d"
-              },
-              "_frontend_node_folder_id": {
-                "value": "0aa379d3-3477-476b-b9ee-329bfe8db318"
-              },
               "_type": "Component",
               "advanced_mode": {
                 "_input_type": "BoolInput",
@@ -219,7 +120,7 @@
                 "dynamic": false,
                 "info": "AWS Access key ID.",
                 "input_types": [],
-                "load_from_db": false,
+                "load_from_db": true,
                 "name": "aws_access_key_id",
                 "override_skip": false,
                 "password": true,
@@ -259,7 +160,7 @@
                 "dynamic": false,
                 "info": "AWS Secret Key.",
                 "input_types": [],
-                "load_from_db": false,
+                "load_from_db": true,
                 "name": "aws_secret_access_key",
                 "override_skip": false,
                 "password": true,
@@ -481,7 +382,6 @@
                 "type": "bool",
                 "value": true
               },
-              "is_refresh": false,
               "markdown": {
                 "_input_type": "BoolInput",
                 "advanced": false,
@@ -622,7 +522,7 @@
                   "bz2",
                   "gz"
                 ],
-                "file_path": [],
+                "file_path": "",
                 "info": "Supported file extensions: csv, json, pdf, txt, md, mdx, yaml, yml, xml, html, htm, docx, py, sh, sql, js, ts, tsx, adoc, asciidoc, asc, bmp, dotx, dotm, docm, jpg, jpeg, png, potx, ppsx, pptm, potm, ppsm, pptx, tiff, xls, xlsx, xhtml, webp; optionally bundled in file extensions: zip, tar, tgz, bz2, gz",
                 "list": true,
                 "list_add_label": "Add More",
@@ -638,7 +538,7 @@
                 "trace_as_metadata": true,
                 "track_in_telemetry": false,
                 "type": "file",
-                "value": ""
+                "value": []
               },
               "pipeline": {
                 "_input_type": "DropdownInput",
@@ -717,7 +617,7 @@
                 "dynamic": false,
                 "info": "Your Google Cloud Platform service account JSON key as a secret string (complete JSON content).",
                 "input_types": [],
-                "load_from_db": false,
+                "load_from_db": true,
                 "name": "service_account_key",
                 "override_skip": false,
                 "password": true,
@@ -784,10 +684,8 @@
                 "type": "sortableList",
                 "value": [
                   {
-                    "chosen": false,
                     "icon": "hard-drive",
-                    "name": "Local",
-                    "selected": false
+                    "name": "Local"
                   }
                 ]
               },
@@ -811,28 +709,910 @@
                 "type": "bool",
                 "value": true
               }
-            },
-            "tool_mode": false
+            }
           },
-          "showNode": true,
-          "type": "File"
-        },
-        "dragging": false,
-        "id": "File-GXz29",
-        "measured": {
-          "height": 275,
-          "width": 320
-        },
-        "position": {
-          "x": -644.5593592262518,
-          "y": 522.2274954315673
-        },
-        "selected": false,
-        "type": "genericNode"
+          "selected_output": "message"
+        }
       },
       {
+        "id": "ChatInput-ingest",
+        "type": "genericNode",
+        "position": {
+          "x": 40,
+          "y": 360
+        },
+        "positionAbsolute": {
+          "x": 40,
+          "y": 360
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "height": 250,
+          "width": 320
+        },
         "data": {
-          "id": "StructuredOutput-qhWw7",
+          "id": "ChatInput-ingest",
+          "type": "ChatInput",
+          "op_version": "main",
+          "showOutput": true,
+          "description": "Get chat inputs from the Playground.",
+          "display_name": "Input Teks Nota / Chat Langsung",
+          "node": {
+            "base_classes": [
+              "Message"
+            ],
+            "beta": false,
+            "conditional_paths": [],
+            "custom_fields": {},
+            "description": "Get chat inputs from the Playground.",
+            "display_name": "Input Teks Nota / Chat Langsung",
+            "documentation": "https://docs.langflow.org/chat-input-and-output",
+            "edited": false,
+            "field_order": [
+              "input_value",
+              "should_store_message",
+              "sender",
+              "sender_name",
+              "session_id",
+              "context_id",
+              "files"
+            ],
+            "frozen": false,
+            "icon": "MessagesSquare",
+            "legacy": false,
+            "lf_version": "1.9.2",
+            "output_types": [],
+            "outputs": [
+              {
+                "allows_loop": false,
+                "cache": true,
+                "display_name": "Chat Message",
+                "group_outputs": false,
+                "method": "message_response",
+                "name": "message",
+                "selected": "Message",
+                "tool_mode": true,
+                "types": [
+                  "Message"
+                ],
+                "value": "__UNDEFINED__"
+              }
+            ],
+            "pinned": false,
+            "template": {
+              "_type": "Component",
+              "code": {
+                "advanced": true,
+                "dynamic": true,
+                "fileTypes": [],
+                "file_path": "",
+                "info": "",
+                "list": false,
+                "load_from_db": false,
+                "multiline": true,
+                "name": "code",
+                "password": false,
+                "placeholder": "",
+                "required": true,
+                "show": true,
+                "title_case": false,
+                "type": "code",
+                "value": "from lfx.base.data.utils import IMG_FILE_TYPES, TEXT_FILE_TYPES\nfrom lfx.base.io.chat import ChatComponent\nfrom lfx.inputs.inputs import BoolInput\nfrom lfx.io import (\n    DropdownInput,\n    FileInput,\n    MessageTextInput,\n    MultilineInput,\n    Output,\n)\nfrom lfx.schema.message import Message\nfrom lfx.utils.constants import (\n    MESSAGE_SENDER_AI,\n    MESSAGE_SENDER_NAME_USER,\n    MESSAGE_SENDER_USER,\n)\n\n\nclass ChatInput(ChatComponent):\n    display_name = \"Chat Input\"\n    description = \"Get chat inputs from the Playground.\"\n    documentation: str = \"https://docs.langflow.org/chat-input-and-output\"\n    icon = \"MessagesSquare\"\n    name = \"ChatInput\"\n    minimized = True\n\n    inputs = [\n        MultilineInput(\n            name=\"input_value\",\n            display_name=\"Input Text\",\n            value=\"\",\n            info=\"Message to be passed as input.\",\n            input_types=[],\n        ),\n        BoolInput(\n            name=\"should_store_message\",\n            display_name=\"Store Messages\",\n            info=\"Store the message in the history.\",\n            value=True,\n            advanced=True,\n        ),\n        DropdownInput(\n            name=\"sender\",\n            display_name=\"Sender Type\",\n            options=[MESSAGE_SENDER_AI, MESSAGE_SENDER_USER],\n            value=MESSAGE_SENDER_USER,\n            info=\"Type of sender.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"sender_name\",\n            display_name=\"Sender Name\",\n            info=\"Name of the sender.\",\n            value=MESSAGE_SENDER_NAME_USER,\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"The session ID of the chat. If empty, the current session ID parameter will be used.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"context_id\",\n            display_name=\"Context ID\",\n            info=\"The context ID of the chat. Adds an extra layer to the local memory.\",\n            value=\"\",\n            advanced=True,\n        ),\n        FileInput(\n            name=\"files\",\n            display_name=\"Files\",\n            file_types=TEXT_FILE_TYPES + IMG_FILE_TYPES,\n            info=\"Files to be sent with the message.\",\n            advanced=True,\n            is_list=True,\n            temp_file=True,\n        ),\n    ]\n    outputs = [\n        Output(display_name=\"Chat Message\", name=\"message\", method=\"message_response\"),\n    ]\n\n    async def message_response(self) -> Message:\n        # Ensure files is a list and filter out empty/None values\n        files = self.files if self.files else []\n        if files and not isinstance(files, list):\n            files = [files]\n        # Filter out None/empty values\n        files = [f for f in files if f is not None and f != \"\"]\n\n        session_id = self.session_id or self.graph.session_id or \"\"\n        message = await Message.create(\n            text=self.input_value,\n            sender=self.sender,\n            sender_name=self.sender_name,\n            session_id=session_id,\n            context_id=self.context_id,\n            files=files,\n        )\n        if session_id and isinstance(message, Message) and self.should_store_message:\n            stored_message = await self.send_message(\n                message,\n            )\n            self.message.value = stored_message\n            message = stored_message\n\n        self.status = message\n        return message\n"
+              },
+              "context_id": {
+                "_input_type": "MessageTextInput",
+                "advanced": true,
+                "display_name": "Context ID",
+                "dynamic": false,
+                "info": "The context ID of the chat. Adds an extra layer to the local memory.",
+                "input_types": [
+                  "Message"
+                ],
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "name": "context_id",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": ""
+              },
+              "files": {
+                "_input_type": "FileInput",
+                "advanced": true,
+                "display_name": "Files",
+                "dynamic": false,
+                "fileTypes": [
+                  "csv",
+                  "json",
+                  "pdf",
+                  "txt",
+                  "md",
+                  "mdx",
+                  "yaml",
+                  "yml",
+                  "xml",
+                  "html",
+                  "htm",
+                  "docx",
+                  "py",
+                  "sh",
+                  "sql",
+                  "js",
+                  "ts",
+                  "tsx",
+                  "jpg",
+                  "jpeg",
+                  "png",
+                  "bmp",
+                  "image"
+                ],
+                "file_path": "",
+                "info": "Files to be sent with the message.",
+                "list": true,
+                "list_add_label": "Add More",
+                "name": "files",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "temp_file": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "file",
+                "value": ""
+              },
+              "input_value": {
+                "_input_type": "MultilineInput",
+                "advanced": false,
+                "ai_enabled": false,
+                "copy_field": false,
+                "display_name": "Input Text",
+                "dynamic": false,
+                "info": "Message to be passed as input.",
+                "input_types": [],
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "multiline": true,
+                "name": "input_value",
+                "override_skip": false,
+                "password": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": ""
+              },
+              "sender": {
+                "_input_type": "DropdownInput",
+                "advanced": true,
+                "combobox": false,
+                "dialog_inputs": {},
+                "display_name": "Sender Type",
+                "dynamic": false,
+                "external_options": {},
+                "info": "Type of sender.",
+                "name": "sender",
+                "options": [
+                  "Machine",
+                  "User"
+                ],
+                "options_metadata": [],
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "toggle": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "str",
+                "value": "User"
+              },
+              "sender_name": {
+                "_input_type": "MessageTextInput",
+                "advanced": true,
+                "display_name": "Sender Name",
+                "dynamic": false,
+                "info": "Name of the sender.",
+                "input_types": [
+                  "Message"
+                ],
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "name": "sender_name",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": "User"
+              },
+              "session_id": {
+                "_input_type": "MessageTextInput",
+                "advanced": true,
+                "display_name": "Session ID",
+                "dynamic": false,
+                "info": "The session ID of the chat. If empty, the current session ID parameter will be used.",
+                "input_types": [
+                  "Message"
+                ],
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "name": "session_id",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": ""
+              },
+              "should_store_message": {
+                "_input_type": "BoolInput",
+                "advanced": true,
+                "display_name": "Store Messages",
+                "dynamic": false,
+                "info": "Store the message in the history.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "should_store_message",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "bool",
+                "value": true
+              }
+            }
+          },
+          "selected_output": "message"
+        }
+      },
+      {
+        "id": "Gateway-ingest",
+        "type": "genericNode",
+        "position": {
+          "x": 420,
+          "y": 180
+        },
+        "positionAbsolute": {
+          "x": 420,
+          "y": 180
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "height": 250,
+          "width": 320
+        },
+        "data": {
+          "id": "Gateway-ingest",
+          "type": "DocuFlowInputGateway",
+          "op_version": "main",
+          "showOutput": true,
+          "description": "",
+          "display_name": "DocuFlow Ingestion Gateway",
+          "node": {
+            "base_classes": [
+              "Message"
+            ],
+            "beta": false,
+            "conditional_paths": [],
+            "custom_fields": {},
+            "description": "",
+            "display_name": "DocuFlow Ingestion Gateway",
+            "documentation": "",
+            "edited": false,
+            "field_order": [
+              "file_message",
+              "chat_message",
+              "fallback_text"
+            ],
+            "frozen": false,
+            "icon": "Langflow",
+            "legacy": false,
+            "lf_version": "1.9.2",
+            "output_types": [],
+            "outputs": [
+              {
+                "allows_loop": false,
+                "cache": true,
+                "display_name": "Teks Siap Ekstraksi",
+                "group_outputs": false,
+                "method": "process_input",
+                "name": "output_text",
+                "selected": "Message",
+                "tool_mode": true,
+                "types": [
+                  "Message"
+                ],
+                "value": "__UNDEFINED__"
+              }
+            ],
+            "pinned": false,
+            "template": {
+              "_type": "Component",
+              "code": {
+                "_input_type": "CodeInput",
+                "advanced": true,
+                "display_name": "",
+                "dynamic": true,
+                "info": "",
+                "list": false,
+                "load_from_db": false,
+                "name": "code",
+                "placeholder": "",
+                "required": true,
+                "show": true,
+                "title_case": false,
+                "trace_as_metadata": true,
+                "type": "code",
+                "value": "\"\"\"DocuFlow Ingestion Gateway Component for Langflow.\nMemungkinkan input fleksibel: Menerima file upload (PDF/TXT) ATAU teks chat langsung\nsehingga pengguna tidak harus selalu memiliki/mengunggah file PDF yang sudah jadi.\n\"\"\"\nfrom lfx.custom.custom_component.component import Component\nfrom lfx.io import HandleInput, MessageTextInput, Output\nfrom lfx.schema.message import Message\n\n\nclass DocuFlowInputGateway(Component):\n    display_name = \"DocuFlow Ingestion Gateway\"\n    description = \"Pintu gerbang input fleksibel: Menerima File Upload ATAU Teks Chat langsung tanpa harus punya PDF.\"\n    icon = \"file-input\"\n    name = \"DocuFlowInputGateway\"\n\n    inputs = [\n        HandleInput(\n            name=\"file_message\",\n            display_name=\"File Dokumen (PDF/TXT)\",\n            input_types=[\"Message\", \"Data\", \"Text\"],\n            required=False,\n            info=\"Input dari file yang diunggah (jika ada file fisik/PDF).\",\n        ),\n        HandleInput(\n            name=\"chat_message\",\n            display_name=\"Teks Chat / Nota Langsung\",\n            input_types=[\"Message\", \"Text\"],\n            required=False,\n            info=\"Input langsung dari Playground chat (pengguna dapat mengetik transaksi langsung tanpa PDF).\",\n        ),\n        MessageTextInput(\n            name=\"fallback_text\",\n            display_name=\"Teks Cadangan (Opsional)\",\n            value=\"\",\n            advanced=True,\n            info=\"Teks manual jika file dan chat keduanya kosong.\",\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Teks Siap Ekstraksi\", name=\"output_text\", method=\"process_input\"),\n    ]\n\n    def _extract_text(self, obj):\n        if obj is None:\n            return \"\"\n        if hasattr(obj, \"text\") and obj.text:\n            return str(obj.text).strip()\n        if hasattr(obj, \"data\") and isinstance(obj.data, dict):\n            # Cek field text/content pada data\n            for k in (\"text\", \"content\", \"data\", \"raw\"):\n                if k in obj.data and obj.data[k]:\n                    return str(obj.data[k]).strip()\n        return str(obj).strip()\n\n    def process_input(self) -> Message:\n        file_txt = self._extract_text(self.file_message)\n        chat_txt = self._extract_text(self.chat_message)\n        fallback = str(self.fallback_text or \"\").strip()\n\n        # Prioritas 1: Jika ada file upload nyata yang tidak kosong\n        if file_txt and file_txt.lower() not in (\"\", \"none\", \"null\", \"__undefined__\"):\n            self.status = f\"Sumber: File Upload ({len(file_txt)} karakter)\"\n            return Message(text=file_txt)\n\n        # Prioritas 2: Jika pengguna mengetik teks langsung di chat\n        # Abaikan hanya jika teks berupa trigger kosong pendek tanpa informasi transaksi\n        dummy_triggers = {\"\", \"proses\", \"run\", \"lanjut\", \"halo\", \"hi\", \"test\", \"start\", \"ekstrak\"}\n        if chat_txt and chat_txt.lower() not in dummy_triggers and len(chat_txt) > 5:\n            self.status = f\"Sumber: Chat Input Langsung ({len(chat_txt)} karakter)\"\n            return Message(text=chat_txt)\n\n        # Prioritas 3: Fallback text jika diisi\n        if fallback:\n            self.status = \"Sumber: Teks Cadangan Manual\"\n            return Message(text=fallback)\n\n        # Jika chat hanya berupa trigger aktivasi \"proses\" tapi file kosong\n        if chat_txt:\n            return Message(\n                text=\"PERINGATAN: Belum ada file dokumen yang diunggah dan teks chat tidak memuat data transaksi. \"\n                     \"Silakan lampirkan file invoice/kwitansi ATAU ketik langsung rincian transaksinya di chat ini.\"\n            )\n\n        self.status = \"Menunggu input (upload file atau ketik teks di chat)...\"\n        return Message(text=\"\")\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false
+              },
+              "file_message": {
+                "_input_type": "HandleInput",
+                "advanced": false,
+                "display_name": "File Dokumen (PDF/TXT)",
+                "dynamic": false,
+                "info": "",
+                "input_types": [
+                  "Message",
+                  "Data",
+                  "Text"
+                ],
+                "list": false,
+                "load_from_db": false,
+                "name": "file_message",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "trace_as_input": true,
+                "tool_mode": false,
+                "type": "other",
+                "value": ""
+              },
+              "chat_message": {
+                "_input_type": "HandleInput",
+                "advanced": false,
+                "display_name": "Teks Chat / Nota Langsung",
+                "dynamic": false,
+                "info": "",
+                "input_types": [
+                  "Message",
+                  "Text"
+                ],
+                "list": false,
+                "load_from_db": false,
+                "name": "chat_message",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "trace_as_input": true,
+                "tool_mode": false,
+                "type": "other",
+                "value": ""
+              },
+              "fallback_text": {
+                "_input_type": "MultilineInput",
+                "advanced": true,
+                "display_name": "Teks Cadangan",
+                "dynamic": false,
+                "info": "",
+                "input_types": [
+                  "Message"
+                ],
+                "list": false,
+                "load_from_db": false,
+                "multiline": true,
+                "name": "fallback_text",
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "type": "str",
+                "value": ""
+              }
+            }
+          },
+          "selected_output": "output_text"
+        }
+      },
+      {
+        "id": "LLM-extract-1",
+        "type": "genericNode",
+        "position": {
+          "x": 420,
+          "y": 520
+        },
+        "positionAbsolute": {
+          "x": 420,
+          "y": 520
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "height": 250,
+          "width": 320
+        },
+        "data": {
+          "id": "LLM-extract-1",
+          "type": "OpenAIModel",
+          "op_version": "main",
+          "showOutput": true,
+          "description": "Generates text using OpenAI LLMs.",
+          "display_name": "OpenAI",
+          "node": {
+            "base_classes": [
+              "LanguageModel",
+              "Message"
+            ],
+            "beta": false,
+            "conditional_paths": [],
+            "custom_fields": {},
+            "description": "Generates text using OpenAI LLMs.",
+            "display_name": "OpenAI",
+            "documentation": "",
+            "edited": false,
+            "field_order": [
+              "input_value",
+              "system_message",
+              "stream",
+              "max_tokens",
+              "model_kwargs",
+              "json_mode",
+              "model_name",
+              "openai_api_base",
+              "api_key",
+              "temperature",
+              "seed",
+              "max_retries",
+              "timeout"
+            ],
+            "frozen": false,
+            "icon": "OpenAI",
+            "legacy": false,
+            "lf_version": "1.9.2",
+            "output_types": [],
+            "outputs": [
+              {
+                "allows_loop": false,
+                "cache": true,
+                "display_name": "Model Response",
+                "group_outputs": false,
+                "method": "text_response",
+                "name": "text_output",
+                "selected": "Message",
+                "tool_mode": true,
+                "types": [
+                  "Message"
+                ],
+                "value": "__UNDEFINED__"
+              },
+              {
+                "allows_loop": false,
+                "cache": true,
+                "display_name": "Language Model",
+                "group_outputs": false,
+                "method": "build_model",
+                "name": "model_output",
+                "selected": "LanguageModel",
+                "tool_mode": true,
+                "types": [
+                  "LanguageModel"
+                ],
+                "value": "__UNDEFINED__"
+              }
+            ],
+            "pinned": false,
+            "template": {
+              "_type": "Component",
+              "api_key": {
+                "_input_type": "SecretStrInput",
+                "advanced": false,
+                "display_name": "OpenAI API Key",
+                "dynamic": false,
+                "info": "The OpenAI API Key to use for the OpenAI model.",
+                "input_types": [],
+                "load_from_db": true,
+                "name": "api_key",
+                "override_skip": false,
+                "password": true,
+                "placeholder": "",
+                "required": true,
+                "show": true,
+                "title_case": false,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": ""
+              },
+              "code": {
+                "advanced": true,
+                "dynamic": true,
+                "fileTypes": [],
+                "file_path": "",
+                "info": "",
+                "list": false,
+                "load_from_db": false,
+                "multiline": true,
+                "name": "code",
+                "password": false,
+                "placeholder": "",
+                "required": true,
+                "show": true,
+                "title_case": false,
+                "type": "code",
+                "value": "from typing import Any\n\nfrom langchain_openai import ChatOpenAI\nfrom pydantic.v1 import SecretStr\n\nfrom lfx.base.models.model import LCModelComponent\nfrom lfx.base.models.openai_constants import OPENAI_CHAT_MODEL_NAMES, OPENAI_REASONING_MODEL_NAMES\nfrom lfx.field_typing import LanguageModel\nfrom lfx.field_typing.range_spec import RangeSpec\nfrom lfx.inputs.inputs import BoolInput, DictInput, DropdownInput, IntInput, SecretStrInput, SliderInput, StrInput\nfrom lfx.log.logger import logger\n\n\nclass OpenAIModelComponent(LCModelComponent):\n    display_name = \"OpenAI\"\n    description = \"Generates text using OpenAI LLMs.\"\n    icon = \"OpenAI\"\n    name = \"OpenAIModel\"\n\n    inputs = [\n        *LCModelComponent.get_base_inputs(),\n        IntInput(\n            name=\"max_tokens\",\n            display_name=\"Max Tokens\",\n            advanced=True,\n            info=\"The maximum number of tokens to generate. Set to 0 for unlimited tokens.\",\n            range_spec=RangeSpec(min=0, max=128000),\n        ),\n        DictInput(\n            name=\"model_kwargs\",\n            display_name=\"Model Kwargs\",\n            advanced=True,\n            info=\"Additional keyword arguments to pass to the model.\",\n        ),\n        BoolInput(\n            name=\"json_mode\",\n            display_name=\"JSON Mode\",\n            advanced=True,\n            info=\"If True, it will output JSON regardless of passing a schema.\",\n        ),\n        DropdownInput(\n            name=\"model_name\",\n            display_name=\"Model Name\",\n            advanced=False,\n            options=OPENAI_CHAT_MODEL_NAMES + OPENAI_REASONING_MODEL_NAMES,\n            value=OPENAI_CHAT_MODEL_NAMES[0],\n            combobox=True,\n            real_time_refresh=True,\n        ),\n        StrInput(\n            name=\"openai_api_base\",\n            display_name=\"OpenAI API Base\",\n            advanced=True,\n            info=\"The base URL of the OpenAI API. \"\n            \"Defaults to https://api.openai.com/v1. \"\n            \"You can change this to use other APIs like JinaChat, LocalAI and Prem.\",\n        ),\n        SecretStrInput(\n            name=\"api_key\",\n            display_name=\"OpenAI API Key\",\n            info=\"The OpenAI API Key to use for the OpenAI model.\",\n            advanced=False,\n            value=\"OPENAI_API_KEY\",\n            required=True,\n        ),\n        SliderInput(\n            name=\"temperature\",\n            display_name=\"Temperature\",\n            value=0.1,\n            range_spec=RangeSpec(min=0, max=1, step=0.01),\n            show=True,\n        ),\n        IntInput(\n            name=\"seed\",\n            display_name=\"Seed\",\n            info=\"The seed controls the reproducibility of the job.\",\n            advanced=True,\n            value=1,\n        ),\n        IntInput(\n            name=\"max_retries\",\n            display_name=\"Max Retries\",\n            info=\"The maximum number of retries to make when generating.\",\n            advanced=True,\n            value=5,\n        ),\n        IntInput(\n            name=\"timeout\",\n            display_name=\"Timeout\",\n            info=\"The timeout for requests to OpenAI completion API.\",\n            advanced=True,\n            value=700,\n        ),\n    ]\n\n    def build_model(self) -> LanguageModel:  # type: ignore[type-var]\n        logger.debug(f\"Executing request with model: {self.model_name}\")\n        # Handle api_key - it can be string or SecretStr\n        api_key_value = None\n        if self.api_key:\n            logger.debug(f\"API key type: {type(self.api_key)}, value: {'***' if self.api_key else None}\")\n            if isinstance(self.api_key, SecretStr):\n                api_key_value = self.api_key.get_secret_value()\n            else:\n                api_key_value = str(self.api_key)\n        logger.debug(f\"Final api_key_value type: {type(api_key_value)}, value: {'***' if api_key_value else None}\")\n\n        # Handle model_kwargs and ensure api_key doesn't conflict\n        model_kwargs = self.model_kwargs or {}\n        # Remove api_key from model_kwargs if it exists to prevent conflicts\n        if \"api_key\" in model_kwargs:\n            logger.warning(\"api_key found in model_kwargs, removing to prevent conflicts\")\n            model_kwargs = dict(model_kwargs)  # Make a copy\n            del model_kwargs[\"api_key\"]\n\n        parameters = {\n            \"api_key\": api_key_value,\n            \"model_name\": self.model_name,\n            \"max_tokens\": self.max_tokens or None,\n            \"model_kwargs\": model_kwargs,\n            \"base_url\": self.openai_api_base or \"https://api.openai.com/v1\",\n            \"max_retries\": self.max_retries,\n            \"timeout\": self.timeout,\n        }\n\n        # TODO: Revisit if/once parameters are supported for reasoning models\n        unsupported_params_for_reasoning_models = [\"temperature\", \"seed\"]\n\n        if self.model_name not in OPENAI_REASONING_MODEL_NAMES:\n            parameters[\"temperature\"] = self.temperature if self.temperature is not None else 0.1\n            parameters[\"seed\"] = self.seed\n        else:\n            params_str = \", \".join(unsupported_params_for_reasoning_models)\n            logger.debug(f\"{self.model_name} is a reasoning model, {params_str} are not configurable. Ignoring.\")\n\n        # Ensure all parameter values are the correct types\n        if isinstance(parameters.get(\"api_key\"), SecretStr):\n            parameters[\"api_key\"] = parameters[\"api_key\"].get_secret_value()\n        parameters[\"stream_usage\"] = True\n        output = ChatOpenAI(**parameters)\n        if self.json_mode:\n            output = output.bind(response_format={\"type\": \"json_object\"})\n\n        return output\n\n    def _get_exception_message(self, e: Exception):\n        \"\"\"Get a message from an OpenAI exception.\n\n        Args:\n            e (Exception): The exception to get the message from.\n\n        Returns:\n            str: The message from the exception.\n        \"\"\"\n        try:\n            from openai import BadRequestError, NotFoundError\n        except ImportError:\n            return None\n        if isinstance(e, NotFoundError):\n            body = getattr(e, \"body\", None) or {}\n            if isinstance(body, dict) and body.get(\"code\") == \"model_not_found\":\n                return (\n                    f\"Model '{self.model_name}' is not available for this OpenAI account. \"\n                    \"Your API tier may not have access yet — check \"\n                    \"https://platform.openai.com/settings/organization/limits \"\n                    \"or select a different model.\"\n                )\n        if isinstance(e, BadRequestError):\n            message = e.body.get(\"message\")\n            if message:\n                return message\n        return None\n\n    def update_build_config(self, build_config: dict, field_value: Any, field_name: str | None = None) -> dict:\n        if field_name in {\"base_url\", \"model_name\", \"api_key\"} and field_value in OPENAI_REASONING_MODEL_NAMES:\n            build_config[\"temperature\"][\"show\"] = False\n            build_config[\"seed\"][\"show\"] = False\n            # Hide system_message for o1 models - currently unsupported\n            if field_value.startswith(\"o1\") and \"system_message\" in build_config:\n                build_config[\"system_message\"][\"show\"] = False\n        if field_name in {\"base_url\", \"model_name\", \"api_key\"} and field_value in OPENAI_CHAT_MODEL_NAMES:\n            build_config[\"temperature\"][\"show\"] = True\n            build_config[\"seed\"][\"show\"] = True\n            if \"system_message\" in build_config:\n                build_config[\"system_message\"][\"show\"] = True\n        return build_config\n"
+              },
+              "input_value": {
+                "_input_type": "MessageInput",
+                "advanced": false,
+                "display_name": "Input",
+                "dynamic": false,
+                "info": "",
+                "input_types": [
+                  "Message"
+                ],
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "name": "input_value",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": ""
+              },
+              "json_mode": {
+                "_input_type": "BoolInput",
+                "advanced": true,
+                "display_name": "JSON Mode",
+                "dynamic": false,
+                "info": "If True, it will output JSON regardless of passing a schema.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "json_mode",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "bool",
+                "value": false
+              },
+              "max_retries": {
+                "_input_type": "IntInput",
+                "advanced": true,
+                "display_name": "Max Retries",
+                "dynamic": false,
+                "info": "The maximum number of retries to make when generating.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "max_retries",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "int",
+                "value": 4
+              },
+              "max_tokens": {
+                "_input_type": "IntInput",
+                "advanced": true,
+                "display_name": "Max Tokens",
+                "dynamic": false,
+                "info": "The maximum number of tokens to generate. Set to 0 for unlimited tokens.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "max_tokens",
+                "override_skip": false,
+                "placeholder": "",
+                "range_spec": {
+                  "max": 128000.0,
+                  "min": 0.0,
+                  "step": 0.1,
+                  "step_type": "float"
+                },
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "int",
+                "value": 2000
+              },
+              "model_kwargs": {
+                "_input_type": "DictInput",
+                "advanced": true,
+                "display_name": "Model Kwargs",
+                "dynamic": false,
+                "info": "Additional keyword arguments to pass to the model.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "model_kwargs",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "track_in_telemetry": false,
+                "type": "dict",
+                "value": {}
+              },
+              "model_name": {
+                "_input_type": "DropdownInput",
+                "advanced": false,
+                "combobox": true,
+                "dialog_inputs": {},
+                "display_name": "Model Name",
+                "dynamic": false,
+                "external_options": {},
+                "info": "",
+                "name": "model_name",
+                "options": [
+                  "gpt-4o-mini",
+                  "gpt-4o",
+                  "gpt-4.1",
+                  "gpt-4.1-mini",
+                  "gpt-4.1-nano",
+                  "gpt-4.5-preview",
+                  "gpt-4-turbo",
+                  "gpt-4-turbo-preview",
+                  "gpt-4",
+                  "gpt-3.5-turbo",
+                  "gpt-5.4",
+                  "gpt-5.4-mini",
+                  "gpt-5.4-pro",
+                  "gpt-5.3-codex",
+                  "gpt-5.2",
+                  "gpt-5.1",
+                  "gpt-5",
+                  "gpt-5-mini",
+                  "gpt-5-nano",
+                  "gpt-5-chat-latest",
+                  "o1"
+                ],
+                "options_metadata": [],
+                "override_skip": false,
+                "placeholder": "",
+                "real_time_refresh": true,
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "toggle": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "str",
+                "value": "openai/gpt-oss-120b"
+              },
+              "openai_api_base": {
+                "_input_type": "StrInput",
+                "advanced": true,
+                "display_name": "OpenAI API Base",
+                "dynamic": false,
+                "info": "The base URL of the OpenAI API. Defaults to https://api.openai.com/v1. You can change this to use other APIs like JinaChat, LocalAI and Prem.",
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "name": "openai_api_base",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": "https://api.groq.com/openai/v1"
+              },
+              "seed": {
+                "_input_type": "IntInput",
+                "advanced": true,
+                "display_name": "Seed",
+                "dynamic": false,
+                "info": "The seed controls the reproducibility of the job.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "seed",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "int",
+                "value": 1
+              },
+              "stream": {
+                "_input_type": "BoolInput",
+                "advanced": true,
+                "display_name": "Stream",
+                "dynamic": false,
+                "info": "Stream the response from the model. Streaming works only in Chat.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "stream",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "bool",
+                "value": false
+              },
+              "system_message": {
+                "_input_type": "MultilineInput",
+                "advanced": false,
+                "ai_enabled": false,
+                "copy_field": false,
+                "display_name": "System Message",
+                "dynamic": false,
+                "info": "System message to pass to the model.",
+                "input_types": [
+                  "Message"
+                ],
+                "list": false,
+                "list_add_label": "Add More",
+                "load_from_db": false,
+                "multiline": true,
+                "name": "system_message",
+                "override_skip": false,
+                "password": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "track_in_telemetry": false,
+                "type": "str",
+                "value": ""
+              },
+              "temperature": {
+                "_input_type": "SliderInput",
+                "advanced": false,
+                "display_name": "Temperature",
+                "dynamic": false,
+                "info": "",
+                "max_label": "",
+                "max_label_icon": "",
+                "min_label": "",
+                "min_label_icon": "",
+                "name": "temperature",
+                "override_skip": false,
+                "placeholder": "",
+                "range_spec": {
+                  "max": 1.0,
+                  "min": 0.0,
+                  "step": 0.01,
+                  "step_type": "float"
+                },
+                "required": false,
+                "show": true,
+                "slider_buttons": false,
+                "slider_buttons_options": [],
+                "slider_input": false,
+                "title_case": false,
+                "tool_mode": false,
+                "track_in_telemetry": false,
+                "type": "slider",
+                "value": 0.1
+              },
+              "timeout": {
+                "_input_type": "IntInput",
+                "advanced": true,
+                "display_name": "Timeout",
+                "dynamic": false,
+                "info": "The timeout for requests to OpenAI completion API.",
+                "list": false,
+                "list_add_label": "Add More",
+                "name": "timeout",
+                "override_skip": false,
+                "placeholder": "",
+                "required": false,
+                "show": true,
+                "title_case": false,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "track_in_telemetry": true,
+                "type": "int",
+                "value": 700
+              }
+            }
+          },
+          "selected_output": "text_output"
+        }
+      },
+      {
+        "id": "StructuredOutput-extract",
+        "type": "genericNode",
+        "position": {
+          "x": 780,
+          "y": 180
+        },
+        "positionAbsolute": {
+          "x": 780,
+          "y": 180
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "height": 250,
+          "width": 320
+        },
+        "data": {
+          "id": "StructuredOutput-extract",
+          "type": "StructuredOutput",
+          "op_version": "main",
+          "showOutput": true,
+          "description": "Uses an LLM to generate structured data. Ideal for extraction and consistency.",
+          "display_name": "Structured Output",
           "node": {
             "base_classes": [
               "JSON",
@@ -855,30 +1635,8 @@
             ],
             "frozen": false,
             "icon": "braces",
-            "last_updated": "2026-08-23T07:22:55.347Z",
             "legacy": false,
-            "metadata": {
-              "code_hash": "6df6b4102fcf",
-              "dependencies": {
-                "dependencies": [
-                  {
-                    "name": "pydantic",
-                    "version": "2.12.5"
-                  },
-                  {
-                    "name": "trustcall",
-                    "version": "0.0.39"
-                  },
-                  {
-                    "name": "lfx",
-                    "version": null
-                  }
-                ],
-                "total_dependencies": 3
-              },
-              "module": "lfx.components.llm_operations.structured_output.StructuredOutputComponent"
-            },
-            "minimized": false,
+            "lf_version": "1.9.2",
             "output_types": [],
             "outputs": [
               {
@@ -886,12 +1644,8 @@
                 "cache": true,
                 "display_name": "Structured Output",
                 "group_outputs": false,
-                "hidden": null,
-                "loop_types": null,
                 "method": "build_structured_output",
                 "name": "structured_output",
-                "options": null,
-                "required_inputs": null,
                 "selected": "JSON",
                 "tool_mode": true,
                 "types": [
@@ -904,12 +1658,8 @@
                 "cache": true,
                 "display_name": "Structured Output",
                 "group_outputs": false,
-                "hidden": null,
-                "loop_types": null,
                 "method": "build_structured_dataframe",
                 "name": "dataframe_output",
-                "options": null,
-                "required_inputs": null,
                 "selected": "Table",
                 "tool_mode": true,
                 "types": [
@@ -920,19 +1670,13 @@
             ],
             "pinned": false,
             "template": {
-              "_frontend_node_flow_id": {
-                "value": "20a3e812-b1bc-4604-a4dc-c707cb8e2c2d"
-              },
-              "_frontend_node_folder_id": {
-                "value": "0aa379d3-3477-476b-b9ee-329bfe8db318"
-              },
               "_type": "Component",
               "api_key": {
                 "_input_type": "SecretStrInput",
                 "advanced": true,
                 "display_name": "API Key",
                 "dynamic": false,
-                "info": "Falls back to GOOGLE_API_KEY environment variable",
+                "info": "Overrides global provider settings. Leave blank to use your pre-configured API Key.",
                 "input_types": [],
                 "load_from_db": true,
                 "name": "api_key",
@@ -945,7 +1689,7 @@
                 "title_case": false,
                 "track_in_telemetry": false,
                 "type": "str",
-                "value": "GOOGLE_API_KEY"
+                "value": ""
               },
               "code": {
                 "advanced": true,
@@ -994,7 +1738,6 @@
                 "type": "str",
                 "value": ""
               },
-              "is_refresh": true,
               "model": {
                 "_input_type": "ModelInput",
                 "advanced": false,
@@ -1019,153 +1762,6 @@
                 "list_add_label": "Add More",
                 "model_type": "language",
                 "name": "model",
-                "options": [
-                  {
-                    "category": "OpenAI",
-                    "icon": "OpenAI",
-                    "metadata": {
-                      "api_key_param": "api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_tokens",
-                      "model_class": "ChatOpenAI",
-                      "model_name_param": "model",
-                      "reasoning_models": [
-                        "gpt-5.4"
-                      ]
-                    },
-                    "name": "gpt-5.4",
-                    "provider": "OpenAI"
-                  },
-                  {
-                    "category": "OpenAI",
-                    "icon": "OpenAI",
-                    "metadata": {
-                      "api_key_param": "api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_tokens",
-                      "model_class": "ChatOpenAI",
-                      "model_name_param": "model",
-                      "reasoning_models": [
-                        "gpt-5.4-mini"
-                      ]
-                    },
-                    "name": "gpt-5.4-mini",
-                    "provider": "OpenAI"
-                  },
-                  {
-                    "category": "OpenAI",
-                    "icon": "OpenAI",
-                    "metadata": {
-                      "api_key_param": "api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_tokens",
-                      "model_class": "ChatOpenAI",
-                      "model_name_param": "model",
-                      "reasoning_models": [
-                        "gpt-5.4-pro"
-                      ]
-                    },
-                    "name": "gpt-5.4-pro",
-                    "provider": "OpenAI"
-                  },
-                  {
-                    "category": "OpenAI",
-                    "icon": "OpenAI",
-                    "metadata": {
-                      "api_key_param": "api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_tokens",
-                      "model_class": "ChatOpenAI",
-                      "model_name_param": "model",
-                      "reasoning_models": [
-                        "gpt-5.3-codex"
-                      ]
-                    },
-                    "name": "gpt-5.3-codex",
-                    "provider": "OpenAI"
-                  },
-                  {
-                    "category": "OpenAI",
-                    "icon": "OpenAI",
-                    "metadata": {
-                      "api_key_param": "api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_tokens",
-                      "model_class": "ChatOpenAI",
-                      "model_name_param": "model",
-                      "reasoning_models": [
-                        "gpt-5.2"
-                      ]
-                    },
-                    "name": "gpt-5.2",
-                    "provider": "OpenAI"
-                  },
-                  {
-                    "category": "Google Generative AI",
-                    "icon": "GoogleGenerativeAI",
-                    "metadata": {
-                      "api_key_param": "google_api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_output_tokens",
-                      "model_class": "ChatGoogleGenerativeAIFixed",
-                      "model_name_param": "model"
-                    },
-                    "name": "gemini-2.5-flash",
-                    "provider": "Google Generative AI"
-                  },
-                  {
-                    "category": "Google Generative AI",
-                    "icon": "GoogleGenerativeAI",
-                    "metadata": {
-                      "api_key_param": "google_api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_output_tokens",
-                      "model_class": "ChatGoogleGenerativeAIFixed",
-                      "model_name_param": "model"
-                    },
-                    "name": "gemini-2.5-pro",
-                    "provider": "Google Generative AI"
-                  },
-                  {
-                    "category": "Google Generative AI",
-                    "icon": "GoogleGenerativeAI",
-                    "metadata": {
-                      "api_key_param": "google_api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_output_tokens",
-                      "model_class": "ChatGoogleGenerativeAIFixed",
-                      "model_name_param": "model"
-                    },
-                    "name": "gemini-2.5-flash-lite",
-                    "provider": "Google Generative AI"
-                  },
-                  {
-                    "category": "Google Generative AI",
-                    "icon": "GoogleGenerativeAI",
-                    "metadata": {
-                      "api_key_param": "google_api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_output_tokens",
-                      "model_class": "ChatGoogleGenerativeAIFixed",
-                      "model_name_param": "model"
-                    },
-                    "name": "gemini-2.5-flash-preview-09-2025",
-                    "provider": "Google Generative AI"
-                  },
-                  {
-                    "category": "Google Generative AI",
-                    "icon": "GoogleGenerativeAI",
-                    "metadata": {
-                      "api_key_param": "google_api_key",
-                      "context_length": 128000,
-                      "max_tokens_field_name": "max_output_tokens",
-                      "model_class": "ChatGoogleGenerativeAIFixed",
-                      "model_name_param": "model"
-                    },
-                    "name": "gemini-2.5-flash-lite-preview-09-2025",
-                    "provider": "Google Generative AI"
-                  }
-                ],
                 "override_skip": false,
                 "placeholder": "Setup Provider",
                 "real_time_refresh": true,
@@ -1177,24 +1773,7 @@
                 "trace_as_input": true,
                 "track_in_telemetry": false,
                 "type": "model",
-                "value": [
-                  {
-                    "icon": "GoogleGenerativeAI",
-                    "metadata": {
-                      "default": true,
-                      "deprecated": false,
-                      "icon": "GoogleGenerativeAI",
-                      "model_type": "llm",
-                      "not_supported": false,
-                      "preview": false,
-                      "reasoning": false,
-                      "search": false,
-                      "tool_calling": true
-                    },
-                    "name": "gemini-2.5-flash",
-                    "provider": "Google Generative AI"
-                  }
-                ]
+                "value": ""
               },
               "output_schema": {
                 "_input_type": "TableInput",
@@ -1220,7 +1799,6 @@
                     "description": "Specify the name of the output field.",
                     "display_name": "Name",
                     "edit_mode": "inline",
-                    "formatter": "text",
                     "name": "name",
                     "type": "str"
                   },
@@ -1229,7 +1807,6 @@
                     "description": "Describe the purpose of the output field.",
                     "display_name": "Description",
                     "edit_mode": "popover",
-                    "formatter": "text",
                     "name": "description",
                     "type": "str"
                   },
@@ -1238,7 +1815,6 @@
                     "description": "Indicate the data type of the output field (e.g., str, int, float, bool, dict).",
                     "display_name": "Type",
                     "edit_mode": "inline",
-                    "formatter": "text",
                     "name": "type",
                     "options": [
                       "str",
@@ -1254,7 +1830,6 @@
                     "description": "Set to True if this output field should be a list of the specified type.",
                     "display_name": "As List",
                     "edit_mode": "inline",
-                    "formatter": "text",
                     "name": "multiple",
                     "type": "boolean"
                   }
@@ -1269,74 +1844,85 @@
                 "value": [
                   {
                     "description": "Jenis dokumen: invoice, receipt, quotation, purchase_order, form, atau other",
-                    "multiple": "False",
+                    "multiple": false,
                     "name": "doc_type",
                     "type": "str"
                   },
                   {
                     "description": "Nama perusahaan/pemasok penerbit dokumen",
-                    "multiple": "False",
-                    "name": "Vendor",
+                    "multiple": false,
+                    "name": "vendor",
                     "type": "str"
                   },
                   {
-                    "description": "Nomor dokumen, misal nomor invoice atau nomor kwintansi",
-                    "multiple": "False",
+                    "description": "Nomor dokumen, misal nomor invoice atau nomor kwitansi",
+                    "multiple": false,
                     "name": "document_number",
                     "type": "str"
                   },
                   {
                     "description": "Tanggal dokumen dalam format YYYY-MM-DD",
-                    "multiple": "False",
+                    "multiple": false,
                     "name": "document_date",
                     "type": "str"
                   },
                   {
                     "description": "Ringkasan isi/keperluan dokumen",
-                    "multiple": "False",
+                    "multiple": false,
                     "name": "description",
                     "type": "str"
                   },
                   {
                     "description": "Nilai subtotal sebelum pajak dalam angka",
-                    "multiple": "False",
+                    "multiple": false,
                     "name": "subtotal",
-                    "type": "str"
+                    "type": "float"
                   },
                   {
                     "description": "Nilai pajak (PPN/VAT) dalam angka",
-                    "multiple": "False",
+                    "multiple": false,
                     "name": "tax",
-                    "type": "str"
+                    "type": "float"
                   },
                   {
                     "description": "Total akhir tagihan dalam angka",
-                    "multiple": "False",
+                    "multiple": false,
                     "name": "total_amount",
+                    "type": "float"
+                  },
+                  {
+                    "description": "Kode mata uang, misal IDR",
+                    "multiple": false,
+                    "name": "currency",
                     "type": "str"
                   },
                   {
-                    "description": "Kategori transaksi, misal pembelian Sparepart",
-                    "multiple": "False",
+                    "description": "Kategori transaksi, misal Pembelian Sparepart",
+                    "multiple": false,
                     "name": "category",
+                    "type": "str"
+                  },
+                  {
+                    "description": "Daftar rincian barang/jasa dalam format JSON array yang berisi item_name, quantity, unit_price, total_price",
+                    "multiple": false,
+                    "name": "items",
                     "type": "str"
                   }
                 ]
               },
               "schema_name": {
-                "_input_type": "MessageTextInput",
-                "advanced": true,
+                "_input_type": "MultilineInput",
+                "advanced": false,
                 "display_name": "Schema Name",
                 "dynamic": false,
-                "info": "Provide a name for the output data schema.",
+                "info": "",
                 "input_types": [
                   "Message"
                 ],
                 "list": false,
-                "list_add_label": "Add More",
                 "load_from_db": false,
+                "multiline": true,
                 "name": "schema_name",
-                "override_skip": false,
                 "placeholder": "",
                 "required": false,
                 "show": true,
@@ -1344,116 +1930,89 @@
                 "tool_mode": false,
                 "trace_as_input": true,
                 "trace_as_metadata": true,
-                "track_in_telemetry": false,
                 "type": "str",
-                "value": ""
+                "value": "docuflow_extraction"
               },
               "system_prompt": {
                 "_input_type": "MultilineInput",
-                "advanced": true,
-                "ai_enabled": false,
-                "copy_field": false,
-                "display_name": "Format Instructions",
+                "advanced": false,
+                "display_name": "System Prompt",
                 "dynamic": false,
-                "info": "The instructions to the language model for formatting the output.",
+                "info": "",
                 "input_types": [
                   "Message"
                 ],
                 "list": false,
-                "list_add_label": "Add More",
                 "load_from_db": false,
                 "multiline": true,
                 "name": "system_prompt",
-                "override_skip": false,
-                "password": false,
                 "placeholder": "",
-                "required": true,
+                "required": false,
                 "show": true,
                 "title_case": false,
                 "tool_mode": false,
                 "trace_as_input": true,
                 "trace_as_metadata": true,
-                "track_in_telemetry": false,
                 "type": "str",
-                "value": "You are an AI that extracts structured JSON objects from unstructured text. Use a predefined schema with expected types (str, int, float, bool, dict). Extract ALL relevant instances that match the schema - if multiple patterns exist, capture them all. Fill missing or ambiguous values with defaults: null for missing values. Remove exact duplicates but keep variations that have different field values. Always return valid JSON in the expected format, never throw errors. If multiple objects can be extracted, return them all in the structured format."
+                "value": "Kamu mengekstrak data dokumen bisnis Indonesia (invoice, kwitansi, faktur, formulir) menjadi JSON terstruktur sesuai skema yang diberikan. Aturan penting: (1) Ubah semua tanggal seperti '12 Agustus 2026', '03/08/2026', atau '3 Agu 2026' menjadi format YYYY-MM-DD. (2) Ubah nilai uang seperti 'Rp 10.323.000' atau 'Rp4.000.000' menjadi angka biasa tanpa titik/koma (misal 10323000). (3) doc_type harus salah satu dari: invoice, receipt, quotation, purchase_order, form, other. (4) currency gunakan kode ISO 4217, misalnya IDR. (5) Ekstrak seluruh rincian item barang/jasa ke dalam field 'items' sebagai JSON array string yang memuat objek: [{\"item_name\": \"...\", \"quantity\": 1, \"unit_price\": 1000, \"total_price\": 1000}]. (6) Jika sebuah field tidak ditemukan di dokumen, isi null. Jangan pernah mengarang data yang tidak ada di dokumen. Kembalikan SEMUA objek dokumen yang ditemukan."
               }
-            },
-            "tool_mode": false
+            }
           },
-          "selected_output": "structured_output",
-          "showNode": true,
-          "type": "StructuredOutput"
-        },
-        "dragging": false,
-        "id": "StructuredOutput-qhWw7",
-        "measured": {
-          "height": 388,
-          "width": 320
-        },
-        "position": {
-          "x": -230.46381038229885,
-          "y": 459.5535001341626
-        },
-        "selected": false,
-        "type": "genericNode"
+          "selected_output": "structured_output"
+        }
       },
       {
+        "id": "SQLiteWriter-save",
+        "type": "genericNode",
+        "position": {
+          "x": 1140,
+          "y": 180
+        },
+        "positionAbsolute": {
+          "x": 1140,
+          "y": 180
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "height": 250,
+          "width": 320
+        },
         "data": {
-          "id": "Prompt Template-jUGvg",
+          "id": "SQLiteWriter-save",
+          "type": "SQLiteDocuFlowWriter",
+          "op_version": "main",
+          "showOutput": true,
+          "description": "",
+          "display_name": "DocuFlow SQLite Writer",
           "node": {
             "base_classes": [
               "Message"
             ],
             "beta": false,
             "conditional_paths": [],
-            "custom_fields": {
-              "template": []
-            },
-            "description": "Create a prompt template with dynamic variables.",
-            "display_name": "Prompt Template",
-            "documentation": "https://docs.langflow.org/components-prompts",
+            "custom_fields": {},
+            "description": "",
+            "display_name": "DocuFlow SQLite Writer",
+            "documentation": "",
             "edited": false,
-            "error": null,
             "field_order": [
-              "template",
-              "use_double_brackets",
-              "tool_placeholder"
+              "rows",
+              "db_path"
             ],
             "frozen": false,
-            "full_path": null,
-            "icon": "prompts",
-            "is_composition": null,
-            "is_input": null,
-            "is_output": null,
+            "icon": "Langflow",
             "legacy": false,
-            "metadata": {
-              "code_hash": "3d3fd7b8a36f",
-              "dependencies": {
-                "dependencies": [
-                  {
-                    "name": "lfx",
-                    "version": null
-                  }
-                ],
-                "total_dependencies": 1
-              },
-              "module": "lfx.components.models_and_agents.prompt.PromptComponent"
-            },
-            "minimized": false,
-            "name": "",
+            "lf_version": "1.9.2",
             "output_types": [],
             "outputs": [
               {
                 "allows_loop": false,
                 "cache": true,
-                "display_name": "Prompt",
+                "display_name": "Status Penyimpanan",
                 "group_outputs": false,
-                "hidden": null,
-                "loop_types": null,
-                "method": "build_prompt",
-                "name": "prompt",
-                "options": null,
-                "required_inputs": null,
+                "method": "write_rows",
+                "name": "status_message",
                 "selected": "Message",
                 "tool_mode": true,
                 "types": [
@@ -1463,232 +2022,105 @@
               }
             ],
             "pinned": false,
-            "priority": null,
-            "replacement": null,
             "template": {
               "_type": "Component",
               "code": {
+                "_input_type": "CodeInput",
                 "advanced": true,
+                "display_name": "",
                 "dynamic": true,
-                "fileTypes": [],
-                "file_path": "",
                 "info": "",
                 "list": false,
                 "load_from_db": false,
-                "multiline": true,
                 "name": "code",
-                "password": false,
                 "placeholder": "",
                 "required": true,
                 "show": true,
                 "title_case": false,
+                "trace_as_metadata": true,
                 "type": "code",
-                "value": "from typing import Any\n\nfrom lfx.base.prompts.api_utils import process_prompt_template\nfrom lfx.custom.custom_component.component import Component\nfrom lfx.inputs.input_mixin import FieldTypes\nfrom lfx.inputs.inputs import DefaultPromptField\nfrom lfx.io import BoolInput, MessageTextInput, Output, PromptInput\nfrom lfx.log.logger import logger\nfrom lfx.schema.dotdict import dotdict\nfrom lfx.schema.message import Message\nfrom lfx.template.utils import update_template_values\nfrom lfx.utils.mustache_security import validate_mustache_template\n\n\nclass PromptComponent(Component):\n    display_name: str = \"Prompt Template\"\n    description: str = \"Create a prompt template with dynamic variables.\"\n    documentation: str = \"https://docs.langflow.org/components-prompts\"\n    icon = \"prompts\"\n    trace_type = \"prompt\"\n    name = \"Prompt Template\"\n\n    inputs = [\n        PromptInput(name=\"template\", display_name=\"Template\"),\n        BoolInput(\n            name=\"use_double_brackets\",\n            display_name=\"Use Double Brackets\",\n            value=False,\n            advanced=True,\n            info=\"Use {{variable}} syntax instead of {variable}.\",\n            real_time_refresh=True,\n        ),\n        MessageTextInput(\n            name=\"tool_placeholder\",\n            display_name=\"Tool Placeholder\",\n            tool_mode=True,\n            advanced=True,\n            show=False,\n            info=\"A placeholder input for tool mode.\",\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Prompt\", name=\"prompt\", method=\"build_prompt\"),\n    ]\n\n    def update_build_config(self, build_config: dotdict, field_value: Any, field_name: str | None = None) -> dotdict:\n        \"\"\"Update the template field type based on the selected mode.\"\"\"\n        if field_name == \"use_double_brackets\":\n            # Change the template field type based on mode\n            is_mustache = field_value is True\n            if is_mustache:\n                build_config[\"template\"][\"type\"] = FieldTypes.MUSTACHE_PROMPT.value\n            else:\n                build_config[\"template\"][\"type\"] = FieldTypes.PROMPT.value\n\n            # Re-process the template to update variables when mode changes\n            template_value = build_config.get(\"template\", {}).get(\"value\", \"\")\n            if template_value:\n                # Ensure custom_fields is properly initialized\n                if \"custom_fields\" not in build_config:\n                    build_config[\"custom_fields\"] = {}\n\n                # Clean up fields from the OLD mode before processing with NEW mode\n                # This ensures we don't keep fields with wrong syntax even if validation fails\n                old_custom_fields = build_config[\"custom_fields\"].get(\"template\", [])\n                for old_field in list(old_custom_fields):\n                    # Remove the field from custom_fields and template\n                    if old_field in old_custom_fields:\n                        old_custom_fields.remove(old_field)\n                    build_config.pop(old_field, None)\n\n                # Try to process template with new mode to add new variables\n                # If validation fails, at least we cleaned up old fields\n                try:\n                    # Validate mustache templates for security\n                    if is_mustache:\n                        validate_mustache_template(template_value)\n\n                    # Re-process template with new mode to add new variables\n                    _ = process_prompt_template(\n                        template=template_value,\n                        name=\"template\",\n                        custom_fields=build_config[\"custom_fields\"],\n                        frontend_node_template=build_config,\n                        is_mustache=is_mustache,\n                    )\n                except ValueError as e:\n                    # If validation fails, we still updated the mode and cleaned old fields\n                    # User will see error when they try to save\n                    logger.debug(f\"Template validation failed during mode switch: {e}\")\n        return build_config\n\n    async def build_prompt(self) -> Message:\n        use_double_brackets = self.use_double_brackets if hasattr(self, \"use_double_brackets\") else False\n        template_format = \"mustache\" if use_double_brackets else \"f-string\"\n        prompt = await Message.from_template_and_variables(template_format=template_format, **self._attributes)\n        self.status = prompt.text\n        return prompt\n\n    def _update_template(self, frontend_node: dict):\n        prompt_template = frontend_node[\"template\"][\"template\"][\"value\"]\n        use_double_brackets = frontend_node[\"template\"].get(\"use_double_brackets\", {}).get(\"value\", False)\n        is_mustache = use_double_brackets is True\n\n        try:\n            # Validate mustache templates for security\n            if is_mustache:\n                validate_mustache_template(prompt_template)\n\n            custom_fields = frontend_node[\"custom_fields\"]\n            frontend_node_template = frontend_node[\"template\"]\n            _ = process_prompt_template(\n                template=prompt_template,\n                name=\"template\",\n                custom_fields=custom_fields,\n                frontend_node_template=frontend_node_template,\n                is_mustache=is_mustache,\n            )\n        except ValueError as e:\n            # If validation fails, don't add variables but allow component to be created\n            logger.debug(f\"Template validation failed in _update_template: {e}\")\n        return frontend_node\n\n    async def update_frontend_node(self, new_frontend_node: dict, current_frontend_node: dict):\n        \"\"\"This function is called after the code validation is done.\"\"\"\n        frontend_node = await super().update_frontend_node(new_frontend_node, current_frontend_node)\n        template = frontend_node[\"template\"][\"template\"][\"value\"]\n        use_double_brackets = frontend_node[\"template\"].get(\"use_double_brackets\", {}).get(\"value\", False)\n        is_mustache = use_double_brackets is True\n\n        try:\n            # Validate mustache templates for security\n            if is_mustache:\n                validate_mustache_template(template)\n\n            # Kept it duplicated for backwards compatibility\n            _ = process_prompt_template(\n                template=template,\n                name=\"template\",\n                custom_fields=frontend_node[\"custom_fields\"],\n                frontend_node_template=frontend_node[\"template\"],\n                is_mustache=is_mustache,\n            )\n        except ValueError as e:\n            # If validation fails, don't add variables but allow component to be updated\n            logger.debug(f\"Template validation failed in update_frontend_node: {e}\")\n        # Now that template is updated, we need to grab any values that were set in the current_frontend_node\n        # and update the frontend_node with those values\n        update_template_values(new_template=frontend_node, previous_template=current_frontend_node[\"template\"])\n        return frontend_node\n\n    def _get_fallback_input(self, **kwargs):\n        return DefaultPromptField(**kwargs)\n"
+                "value": "import json\nimport os\nimport re\nimport sqlite3\nfrom datetime import datetime\n\nfrom lfx.custom.custom_component.component import Component\nfrom lfx.io import HandleInput, MessageTextInput, Output\nfrom lfx.schema.message import Message\n\n\nclass SQLiteDocuFlowWriter(Component):\n    display_name = \"DocuFlow SQLite Writer\"\n    description = \"Validasi hasil ekstraksi AI lalu simpan ke database SQLite (lengkap dengan line items).\"\n    icon = \"database\"\n    name = \"SQLiteDocuFlowWriter\"\n\n    inputs = [\n        HandleInput(\n            name=\"rows\",\n            display_name=\"Hasil Ekstraksi\",\n            input_types=[\"DataFrame\", \"Table\", \"Data\", \"JSON\"],\n            required=True,\n        ),\n        MessageTextInput(\n            name=\"db_path\",\n            display_name=\"Path Database SQLite\",\n            value=\"\",\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Status Penyimpanan\", name=\"status_message\", method=\"write_rows\"),\n    ]\n\n    ALIASES = {\n        \"doc_type\": [\"doc_type\", \"document_type\", \"jenis_dokumen\", \"tipe_dokumen\", \"type\"],\n        \"vendor\": [\"vendor\", \"supplier\", \"penjual\", \"pemasok\", \"dari\", \"perusahaan\", \"company\", \"issuer\"],\n        \"document_number\": [\"document_number\", \"invoice_number\", \"no_invoice\", \"nomor_invoice\", \"nomor\",\n                            \"receipt_number\", \"no_kwitansi\", \"number\", \"no\"],\n        \"document_date\": [\"document_date\", \"invoice_date\", \"tanggal\", \"tanggal_invoice\", \"date\", \"issue_date\"],\n        \"description\": [\"description\", \"deskripsi\", \"keterangan\", \"notes\", \"catatan\", \"untuk_pembayaran\"],\n        \"subtotal\": [\"subtotal\", \"sub_total\", \"jumlah_sebelum_pajak\"],\n        \"tax\": [\"tax\", \"ppn\", \"vat\", \"pajak\"],\n        \"total_amount\": [\"total_amount\", \"total\", \"grand_total\", \"total_dibayar\", \"jumlah_total\", \"amount\"],\n        \"currency\": [\"currency\", \"mata_uang\", \"satuan_mata_uang\"],\n        \"category\": [\"category\", \"kategori\", \"klasifikasi\"],\n        \"items\": [\"items\", \"line_items\", \"daftar_barang\", \"rincian\", \"detail_barang\", \"products\", \"rincian_barang\"],\n    }\n\n    MONTHS_ID = {\n        \"januari\": 1, \"februari\": 2, \"maret\": 3, \"april\": 4, \"mei\": 5, \"juni\": 6,\n        \"juli\": 7, \"agustus\": 8, \"september\": 9, \"oktober\": 10, \"november\": 11, \"desember\": 12,\n        \"jan\": 1, \"feb\": 2, \"mar\": 3, \"apr\": 4, \"jun\": 6, \"jul\": 7,\n        \"ags\": 8, \"agt\": 8, \"sep\": 9, \"okt\": 10, \"nov\": 11, \"des\": 12,\n    }\n    MONTHS_EN = {\n        \"january\": 1, \"february\": 2, \"march\": 3, \"april\": 4, \"may\": 5, \"june\": 6,\n        \"july\": 7, \"august\": 8, \"september\": 9, \"october\": 10, \"november\": 11, \"december\": 12,\n    }\n\n    def _resolve_db_path(self, given_path):\n        if os.environ.get(\"DOCUFLOW_DB_PATH\"):\n            return os.environ[\"DOCUFLOW_DB_PATH\"]\n        p = str(given_path or \"\").strip()\n        if p and os.path.exists(os.path.dirname(p)):\n            return p\n        # Cari jalur database relatif secara otomatis\n        cwd = os.getcwd()\n        candidates = [\n            os.path.join(cwd, \"data\", \"docuflow.db\"),\n            os.path.join(os.path.dirname(__file__) if \"__file__\" in globals() else cwd, \"..\", \"data\", \"docuflow.db\"),\n            r\"C:\\Users\\ASUS\\docuflow-ai\\data\\docuflow.db\",\n            os.path.join(cwd, \"docuflow.db\"),\n        ]\n        for c in candidates:\n            c_abs = os.path.abspath(c)\n            if os.path.exists(os.path.dirname(c_abs)):\n                return c_abs\n        return os.path.abspath(os.path.join(cwd, \"data\", \"docuflow.db\"))\n\n    def _row_to_dict(self, item):\n        if isinstance(item, dict):\n            return item\n        data = getattr(item, \"data\", None)\n        if data is not None:\n            try:\n                return dict(data)\n            except Exception:\n                pass\n        try:\n            return dict(item)\n        except Exception:\n            return None\n\n    def _canonical_key(self, key):\n        k = str(key).strip().lower().replace(\" \", \"_\")\n        for canon, aliases in self.ALIASES.items():\n            if k in aliases:\n                return canon\n        return None\n\n    def _parse_amount(self, value):\n        if value is None or value == \"\":\n            return None\n        if isinstance(value, (int, float)):\n            return float(value)\n        s = re.sub(r\"[^\\d,.\\-]\", \"\", str(value))\n        if not s:\n            return None\n        neg = s.startswith(\"-\")\n        s = s.lstrip(\"-\")\n        if \".\" in s and \",\" in s:\n            if s.rfind(\",\") > s.rfind(\".\"):\n                s = s.replace(\".\", \"\").replace(\",\", \".\")\n            else:\n                s = s.replace(\",\", \"\")\n        elif \",\" in s:\n            parts = s.split(\",\")\n            if len(parts[-1]) == 3 and len(parts) > 1:\n                s = s.replace(\",\", \"\")\n            else:\n                s = s.replace(\",\", \".\")\n        else:\n            whole = s.split(\".\")\n            if len(whole) > 2 or (len(whole) == 2 and len(whole[1]) == 3):\n                s = s.replace(\".\", \"\")\n        try:\n            num = float(s)\n            return -num if neg else num\n        except ValueError:\n            return None\n\n    def _parse_date(self, value):\n        if value is None or str(value).strip() in (\"\", \"None\"):\n            return None, \"\"\n        raw = str(value).strip()\n        s = raw.lower().replace(\"/\", \"-\").replace(\".\", \"-\")\n        for name, num in {**self.MONTHS_ID, **self.MONTHS_EN}.items():\n            if name in s:\n                parts = re.findall(r\"\\d+|[a-z]+\", s)\n                day = next((int(p) for p in parts if p.isdigit() and 1 <= int(p) <= 31), None)\n                year = next((int(p) for p in parts if len(p) == 4 and p.isdigit()), None)\n                if day and year:\n                    try:\n                        return datetime(year, num, day).strftime(\"%Y-%m-%d\"), \"\"\n                    except ValueError:\n                        break\n        for fmt in (\"%Y-%m-%d\", \"%d-%m-%Y\", \"%d-%m-%y\"):\n            try:\n                return datetime.strptime(s, fmt).strftime(\"%Y-%m-%d\"), \"\"\n            except ValueError:\n                continue\n        return None, f\"format tanggal '{raw}' tidak dikenali\"\n\n    def _parse_items(self, raw_items):\n        if not raw_items:\n            return []\n        if isinstance(raw_items, str):\n            try:\n                raw_items = json.loads(raw_items)\n            except Exception:\n                return []\n        if not isinstance(raw_items, list):\n            if isinstance(raw_items, dict):\n                raw_items = [raw_items]\n            else:\n                return []\n\n        parsed = []\n        for it in raw_items:\n            if not isinstance(it, dict):\n                continue\n            name = it.get(\"item_name\") or it.get(\"name\") or it.get(\"nama_barang\") or it.get(\"deskripsi\") or it.get(\"description\")\n            if not name:\n                continue\n            qty = self._parse_amount(it.get(\"quantity\") or it.get(\"qty\") or it.get(\"jumlah\") or 1)\n            unit_p = self._parse_amount(it.get(\"unit_price\") or it.get(\"price\") or it.get(\"harga_satuan\") or it.get(\"harga\"))\n            tot_p = self._parse_amount(it.get(\"total_price\") or it.get(\"subtotal\") or it.get(\"total\") or it.get(\"jumlah_harga\"))\n\n            if tot_p is None and qty is not None and unit_p is not None:\n                tot_p = qty * unit_p\n            elif unit_p is None and qty and tot_p:\n                unit_p = tot_p / qty\n\n            parsed.append({\n                \"item_name\": str(name).strip(),\n                \"quantity\": qty or 1.0,\n                \"unit_price\": unit_p or 0.0,\n                \"total_price\": tot_p or 0.0,\n            })\n        return parsed\n\n    def _normalize_str(self, s):\n        if not s:\n            return \"\"\n        # Bersihkan spasi, tanda baca untuk pencocokan toleran\n        return re.sub(r\"[^\\w]\", \"\", str(s).lower())\n\n    def _validate_and_normalize(self, row):\n        record, warnings = {}, []\n        for key, val in row.items():\n            canon = self._canonical_key(key)\n            if canon:\n                record[canon] = val\n        for field in (\"doc_type\", \"vendor\", \"document_number\", \"description\", \"currency\", \"category\"):\n            v = record.get(field)\n            record[field] = str(v).strip() if v is not None and str(v).strip().lower() != \"null\" else None\n\n        date_val, date_warn = self._parse_date(record.get(\"document_date\"))\n        if date_warn:\n            record[\"document_date\"] = str(record.get(\"document_date\"))\n            warnings.append(date_warn)\n        else:\n            record[\"document_date\"] = date_val\n\n        for field in (\"subtotal\", \"tax\", \"total_amount\"):\n            num = self._parse_amount(record.get(field))\n            if record.get(field) is not None and num is None:\n                warnings.append(f\"nilai {field} tidak dapat dibaca\")\n            record[field] = num\n            if num is not None and num < 0:\n                warnings.append(f\"{field} bernilai negatif\")\n\n        # Parse Line Items\n        line_items = self._parse_items(record.get(\"items\"))\n        record[\"_items\"] = line_items\n\n        # Fallback jika total_amount kosong namun ada line items\n        if record.get(\"total_amount\") is None and line_items:\n            sum_items = sum(it[\"total_price\"] for it in line_items if it.get(\"total_price\"))\n            if sum_items > 0:\n                record[\"total_amount\"] = sum_items\n                if record.get(\"subtotal\") is None:\n                    record[\"subtotal\"] = sum_items\n\n        if record.get(\"currency\") is None and any(\n            record.get(f) is not None for f in (\"subtotal\", \"tax\", \"total_amount\")\n        ):\n            record[\"currency\"] = \"IDR\"\n\n        if not any([record.get(\"vendor\"), record.get(\"document_number\"),\n                    record.get(\"total_amount\") is not None]):\n            return None, [\"baris kosong / tanpa informasi penting\"], \"\"\n        return record, warnings, json.dumps(row, ensure_ascii=False, default=str)\n\n    def _is_duplicate(self, cur, rec):\n        vendor_norm = self._normalize_str(rec.get(\"vendor\"))\n        doc_no = (rec.get(\"document_number\") or \"\").strip()\n        doc_date = (rec.get(\"document_date\") or \"\").strip()\n        total = rec.get(\"total_amount\")\n\n        # Jika nomor dokumen ada dan bermakna: periksa nomor + normalisasi vendor\n        if doc_no and len(doc_no) >= 3:\n            cur.execute(\"SELECT id, vendor, document_number FROM documents WHERE document_number = ?\", (doc_no,))\n            rows = cur.fetchall()\n            for _, v, _ in rows:\n                if not vendor_norm or not v or self._normalize_str(v) == vendor_norm:\n                    return True\n\n        # Jika nomor dokumen tidak ada: HANYA anggap duplikat jika vendor, tanggal, DAN total cocok persis\n        if vendor_norm and doc_date and total is not None:\n            cur.execute(\n                \"SELECT id, vendor, document_date, total_amount FROM documents WHERE document_date = ? AND ABS(total_amount - ?) < 0.01\",\n                (doc_date, total)\n            )\n            rows = cur.fetchall()\n            for _, v, _, _ in rows:\n                if self._normalize_str(v) == vendor_norm:\n                    return True\n\n        return False\n\n    def write_rows(self) -> Message:\n        db_path = self._resolve_db_path(self.db_path)\n        items = self.rows\n        if hasattr(items, \"value\") and not hasattr(items, \"__iter__\"):\n            items = [items]\n        if items is None:\n            items = []\n        if isinstance(items, str):\n            try:\n                items = json.loads(items)\n            except Exception:\n                items = [items]\n        if isinstance(items, dict):\n            for wrap in (\"result\", \"results\", \"data\", \"items\", \"rows\"):\n                if wrap in items and isinstance(items[wrap], (list, dict)):\n                    items = items[wrap]\n                    break\n            if isinstance(items, dict):\n                items = [items]\n        if not isinstance(items, list):\n            items = [items]\n\n        records, all_warnings = [], []\n        for item in items:\n            d = self._row_to_dict(item)\n            if not d:\n                continue\n            rec, warns, raw = self._validate_and_normalize(d)\n            if rec is None:\n                all_warnings.append(f\"dilewati: {warns[0] if warns else 'tidak valid'}\")\n                continue\n            rec[\"_raw\"] = raw\n            records.append(rec)\n            all_warnings.extend(warns)\n\n        if not records:\n            return Message(\n                text=\"GAGAL: tidak ada data valid yang bisa disimpan.\\n\"\n                     \"Pastikan dokumen berisi invoice/kwitansi yang jelas lalu jalankan ulang flow.\"\n            )\n\n        os.makedirs(os.path.dirname(db_path), exist_ok=True)\n        conn = sqlite3.connect(db_path)\n        cur = conn.cursor()\n\n        # Buat tabel documents dan document_items\n        cur.execute(\n            \"\"\"CREATE TABLE IF NOT EXISTS documents (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                doc_type TEXT, vendor TEXT, document_number TEXT,\n                document_date TEXT, description TEXT,\n                subtotal REAL, tax REAL, total_amount REAL,\n                currency TEXT, category TEXT,\n                warnings TEXT, raw_json TEXT,\n                created_at TEXT DEFAULT (datetime('now','localtime'))\n            )\"\"\"\n        )\n        cur.execute(\n            \"\"\"CREATE TABLE IF NOT EXISTS document_items (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                document_id INTEGER,\n                item_name TEXT,\n                quantity REAL,\n                unit_price REAL,\n                total_price REAL,\n                created_at TEXT DEFAULT (datetime('now','localtime')),\n                FOREIGN KEY (document_id) REFERENCES documents (id) ON DELETE CASCADE\n            )\"\"\"\n        )\n\n        saved, duplicates = [], []\n        for rec in records:\n            raw = rec.pop(\"_raw\", None)\n            line_items = rec.pop(\"_items\", [])\n\n            if self._is_duplicate(cur, rec):\n                duplicates.append(rec.get(\"document_number\") or rec.get(\"vendor\") or \"tanpa nomor\")\n                continue\n\n            cur.execute(\n                \"\"\"INSERT INTO documents (doc_type, vendor, document_number, document_date,\n                   description, subtotal, tax, total_amount, currency, category, warnings, raw_json)\n                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)\"\"\",\n                (\n                    rec.get(\"doc_type\"), rec.get(\"vendor\"), rec.get(\"document_number\"),\n                    rec.get(\"document_date\"), rec.get(\"description\"),\n                    rec.get(\"subtotal\"), rec.get(\"tax\"), rec.get(\"total_amount\"),\n                    rec.get(\"currency\"), rec.get(\"category\"),\n                    \"; \".join(all_warnings) if all_warnings else None, raw,\n                ),\n            )\n            doc_id = cur.lastrowid\n\n            # Simpan rincian barang/jasa (line items)\n            if line_items:\n                cur.executemany(\n                    \"\"\"INSERT INTO document_items (document_id, item_name, quantity, unit_price, total_price)\n                       VALUES (?, ?, ?, ?, ?)\"\"\",\n                    [(doc_id, it[\"item_name\"], it[\"quantity\"], it[\"unit_price\"], it[\"total_price\"])\n                     for it in line_items]\n                )\n\n            rec[\"id\"] = doc_id\n            rec[\"items_count\"] = len(line_items)\n            saved.append(rec)\n\n        conn.commit()\n        last_id = cur.lastrowid\n        conn.close()\n\n        lines = []\n        if saved:\n            lines.append(f\"BERHASIL: {len(saved)} dokumen tersimpan ke database DocuFlow.\")\n            for i, r in enumerate(saved, 1):\n                total = f\"{r['total_amount']:,.2f} {r.get('currency') or ''}\".strip() \\\n                    if r.get(\"total_amount\") is not None else \"n/a\"\n                items_info = f\" ({r['items_count']} rincian item)\" if r.get(\"items_count\") else \"\"\n                lines.append(\n                    f\"[{i}] {r.get('doc_type') or '-'} | {r.get('vendor') or '-'} | \"\n                    f\"No: {r.get('document_number') or '-'} | Tgl: {r.get('document_date') or '-'} | \"\n                    f\"Total: {total}{items_info}\"\n                )\n        if duplicates:\n            lines.append(f\"DILEWATI (duplikat): {len(duplicates)} -> {', '.join(duplicates)}\")\n        if all_warnings:\n            lines.append(\"Peringatan validasi: \" + \" | \".join(dict.fromkeys(all_warnings)))\n        if saved:\n            lines.append(f\"Record terakhir id={last_id}. Silakan lanjut bertanya di flow 'DocuFlow Query'.\")\n\n        self.status = \"\\n\".join(lines)\n        return Message(text=self.status)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false
               },
-              "template": {
-                "_input_type": "PromptInput",
+              "rows": {
+                "_input_type": "HandleInput",
                 "advanced": false,
-                "display_name": "Template",
+                "display_name": "Hasil Ekstraksi",
                 "dynamic": false,
                 "info": "",
-                "list": false,
-                "list_add_label": "Add More",
-                "name": "template",
-                "override_skip": false,
-                "placeholder": "",
-                "required": false,
-                "show": true,
-                "title_case": false,
-                "tool_mode": false,
-                "trace_as_input": true,
-                "track_in_telemetry": false,
-                "type": "prompt",
-                "value": "Kamu mengekstrak data dokumen bisnis Indonesia (invoice, kwitansi, faktur, formulir) menjadi JSON terstruktur sesuai skema yang diberikan. Aturan penting: (1) Ubah semua tanggal seperti '12 Agustus 2026', '03/08/2026', atau '3 Agu 2026' menjadi format YYYY-MM-DD. (2) Ubah nilai uang seperti 'Rp 10.323.000' atau 'Rp4.000.000' menjadi angka biasa tanpa titik/koma (misal 10323000). (3) doc_type harus salah satu dari: invoice, receipt, quotation, purchase_order, form, other. (4) currency gunakan kode ISO 4217, misalnya IDR. (5) Jika sebuah field tidak ditemukan di dokumen, isi null. Jangan pernah mengarang data yang tidak ada di dokumen. Kembalikan SEMUA objek dokumen yang ditemukan."
-              },
-              "tool_placeholder": {
-                "_input_type": "MessageTextInput",
-                "advanced": true,
-                "display_name": "Tool Placeholder",
-                "dynamic": false,
-                "info": "A placeholder input for tool mode.",
                 "input_types": [
-                  "Message"
-                ],
-                "list": false,
-                "list_add_label": "Add More",
-                "load_from_db": false,
-                "name": "tool_placeholder",
-                "override_skip": false,
-                "placeholder": "",
-                "required": false,
-                "show": false,
-                "title_case": false,
-                "tool_mode": true,
-                "trace_as_input": true,
-                "trace_as_metadata": true,
-                "track_in_telemetry": false,
-                "type": "str",
-                "value": ""
-              },
-              "use_double_brackets": {
-                "_input_type": "BoolInput",
-                "advanced": true,
-                "display_name": "Use Double Brackets",
-                "dynamic": false,
-                "info": "Use {{variable}} syntax instead of {variable}.",
-                "list": false,
-                "list_add_label": "Add More",
-                "name": "use_double_brackets",
-                "override_skip": false,
-                "placeholder": "",
-                "real_time_refresh": true,
-                "required": false,
-                "show": true,
-                "title_case": false,
-                "tool_mode": false,
-                "trace_as_metadata": true,
-                "track_in_telemetry": true,
-                "type": "bool",
-                "value": false
-              }
-            },
-            "tool_mode": false
-          },
-          "showNode": true,
-          "type": "Prompt Template"
-        },
-        "dragging": false,
-        "id": "Prompt Template-jUGvg",
-        "measured": {
-          "height": 264,
-          "width": 320
-        },
-        "position": {
-          "x": 177.81336448196635,
-          "y": 166.55542839730552
-        },
-        "selected": false,
-        "type": "genericNode"
-      },
-      {
-        "data": {
-          "id": "CustomComponent-OiyNZ",
-          "node": {
-            "base_classes": [
-              "JSON"
-            ],
-            "beta": false,
-            "conditional_paths": [],
-            "custom_fields": {},
-            "description": "Use as a template to create your own component.",
-            "display_name": "Docuflow SQL Writer",
-            "documentation": "https://docs.langflow.org/components-custom-components",
-            "edited": true,
-            "field_order": [
-              "input_value"
-            ],
-            "frozen": false,
-            "icon": "code",
-            "legacy": false,
-            "metadata": {
-              "code_hash": "d50a68a6fa57",
-              "dependencies": {
-                "dependencies": [
-                  {
-                    "name": "lfx",
-                    "version": null
-                  }
-                ],
-                "total_dependencies": 1
-              },
-              "module": "lfx.components.custom_component.custom_component.CustomComponent"
-            },
-            "minimized": false,
-            "output_types": [],
-            "outputs": [
-              {
-                "allows_loop": false,
-                "cache": true,
-                "display_name": "Output",
-                "group_outputs": false,
-                "method": "build_output",
-                "name": "output",
-                "selected": "JSON",
-                "tool_mode": true,
-                "types": [
+                  "DataFrame",
+                  "Table",
+                  "Data",
                   "JSON"
                 ],
-                "value": "__UNDEFINED__"
-              }
-            ],
-            "pinned": false,
-            "template": {
-              "_type": "Component",
-              "code": {
-                "advanced": true,
-                "dynamic": true,
-                "fileTypes": [],
-                "file_path": "",
-                "info": "",
                 "list": false,
                 "load_from_db": false,
-                "multiline": true,
-                "name": "code",
-                "password": false,
+                "name": "rows",
+                "override_skip": false,
                 "placeholder": "",
                 "required": true,
                 "show": true,
                 "title_case": false,
-                "type": "code",
-                "value": "# from lfx.field_typing import Data\nfrom lfx.custom.custom_component.component import Component\nfrom lfx.io import MessageTextInput, Output\nfrom lfx.schema.data import Data\n\n\nclass CustomComponent(Component):\n    display_name = \"Custom Component\"\n    description = \"Use as a template to create your own component.\"\n    documentation: str = \"https://docs.langflow.org/components-custom-components\"\n    icon = \"code\"\n    name = \"CustomComponent\"\n\n    inputs = [\n        MessageTextInput(\n            name=\"input_value\",\n            display_name=\"Input Value\",\n            info=\"This is a custom component Input\",\n            value=\"Hello, World!\",\n            tool_mode=True,\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Output\", name=\"output\", method=\"build_output\"),\n    ]\n\n    def build_output(self) -> Data:\n        data = Data(value=self.input_value)\n        self.status = data\n        return data\n"
+                "trace_as_input": true,
+                "tool_mode": false,
+                "type": "other",
+                "value": ""
               },
-              "input_value": {
+              "db_path": {
                 "_input_type": "MessageTextInput",
-                "advanced": false,
-                "display_name": "Input Value",
+                "advanced": true,
+                "display_name": "Path Database SQLite",
                 "dynamic": false,
-                "info": "This is a custom component Input",
+                "info": "",
                 "input_types": [
                   "Message"
                 ],
                 "list": false,
-                "list_add_label": "Add More",
                 "load_from_db": false,
-                "name": "input_value",
-                "override_skip": false,
+                "multiline": false,
+                "name": "db_path",
                 "placeholder": "",
                 "required": false,
                 "show": true,
                 "title_case": false,
-                "tool_mode": true,
+                "tool_mode": false,
                 "trace_as_input": true,
                 "trace_as_metadata": true,
-                "track_in_telemetry": false,
                 "type": "str",
-                "value": ""
+                "value": "C:\\Users\\ASUS\\docuflow-ai\\data\\docuflow.db"
               }
-            },
-            "tool_mode": false
+            }
           },
-          "showNode": true,
-          "type": "CustomComponent"
-        },
-        "dragging": false,
-        "id": "CustomComponent-OiyNZ",
-        "measured": {
-          "height": 206,
-          "width": 320
-        },
-        "position": {
-          "x": 250.8340848479407,
-          "y": 529.2555483233851
-        },
-        "selected": false,
-        "type": "genericNode"
+          "selected_output": "status_message"
+        }
       },
       {
+        "id": "ChatOutput-ingest",
+        "type": "genericNode",
+        "position": {
+          "x": 1500,
+          "y": 190
+        },
+        "positionAbsolute": {
+          "x": 1500,
+          "y": 190
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "height": 250,
+          "width": 320
+        },
         "data": {
-          "id": "ChatOutput-5SSbb",
+          "id": "ChatOutput-ingest",
+          "type": "ChatOutput",
+          "op_version": "main",
+          "showOutput": true,
+          "description": "Display a chat message in the Playground.",
+          "display_name": "Chat Output",
           "node": {
             "base_classes": [
               "Message"
@@ -1713,28 +2145,7 @@
             "frozen": false,
             "icon": "MessagesSquare",
             "legacy": false,
-            "metadata": {
-              "code_hash": "84009527d08c",
-              "dependencies": {
-                "dependencies": [
-                  {
-                    "name": "orjson",
-                    "version": "3.11.8"
-                  },
-                  {
-                    "name": "fastapi",
-                    "version": "0.136.1"
-                  },
-                  {
-                    "name": "lfx",
-                    "version": null
-                  }
-                ],
-                "total_dependencies": 3
-              },
-              "module": "lfx.components.input_output.chat_output.ChatOutput"
-            },
-            "minimized": true,
+            "lf_version": "1.9.2",
             "output_types": [],
             "outputs": [
               {
@@ -1966,38 +2377,194 @@
                 "type": "bool",
                 "value": true
               }
-            },
-            "tool_mode": false
+            }
           },
-          "showNode": false,
-          "type": "ChatOutput"
-        },
-        "dragging": false,
-        "id": "ChatOutput-5SSbb",
-        "measured": {
-          "height": 52,
-          "width": 192
-        },
-        "position": {
-          "x": 738.9903588129135,
-          "y": 606.29828239705
+          "selected_output": "message"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "reactflow__edge-File-docuflow{odataTypeo:oFileo,oido:oFile-docuflowo,onameo:omessageo,ooutput_typeso:[oMessageo]}-Gateway-ingest{ofieldNameo:ofile_messageo,oido:oGateway-ingesto,oinputTypeso:[oMessageo,oDatao,oTexto],otypeo:oothero}",
+        "source": "File-docuflow",
+        "target": "Gateway-ingest",
+        "sourceHandle": "{odataTypeo: oFileo, oido: oFile-docuflowo, onameo: omessageo, ooutput_typeso: [oMessageo]}",
+        "targetHandle": "{ofieldNameo: ofile_messageo, oido: oGateway-ingesto, oinputTypeso: [oMessageo, oDatao, oTexto], otypeo: oothero}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "File",
+            "id": "File-docuflow",
+            "name": "message",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "file_message",
+            "id": "Gateway-ingest",
+            "inputTypes": [
+              "Message",
+              "Data",
+              "Text"
+            ],
+            "type": "other"
+          }
         },
         "selected": false,
-        "type": "genericNode"
+        "animated": false,
+        "className": ""
+      },
+      {
+        "id": "reactflow__edge-ChatInput-ingest{odataTypeo:oChatInputo,oido:oChatInput-ingesto,onameo:omessageo,ooutput_typeso:[oMessageo]}-Gateway-ingest{ofieldNameo:ochat_messageo,oido:oGateway-ingesto,oinputTypeso:[oMessageo,oTexto],otypeo:oothero}",
+        "source": "ChatInput-ingest",
+        "target": "Gateway-ingest",
+        "sourceHandle": "{odataTypeo: oChatInputo, oido: oChatInput-ingesto, onameo: omessageo, ooutput_typeso: [oMessageo]}",
+        "targetHandle": "{ofieldNameo: ochat_messageo, oido: oGateway-ingesto, oinputTypeso: [oMessageo, oTexto], otypeo: oothero}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "ChatInput",
+            "id": "ChatInput-ingest",
+            "name": "message",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "chat_message",
+            "id": "Gateway-ingest",
+            "inputTypes": [
+              "Message",
+              "Text"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "id": "reactflow__edge-Gateway-ingest{odataTypeo:oDocuFlowInputGatewayo,oido:oGateway-ingesto,onameo:ooutput_texto,ooutput_typeso:[oMessageo]}-StructuredOutput-extract{ofieldNameo:oinput_valueo,oido:oStructuredOutput-extracto,oinputTypeso:[oMessageo,oTexto],otypeo:ostro}",
+        "source": "Gateway-ingest",
+        "target": "StructuredOutput-extract",
+        "sourceHandle": "{odataTypeo: oDocuFlowInputGatewayo, oido: oGateway-ingesto, onameo: ooutput_texto, ooutput_typeso: [oMessageo]}",
+        "targetHandle": "{ofieldNameo: oinput_valueo, oido: oStructuredOutput-extracto, oinputTypeso: [oMessageo, oTexto], otypeo: ostro}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "DocuFlowInputGateway",
+            "id": "Gateway-ingest",
+            "name": "output_text",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "StructuredOutput-extract",
+            "inputTypes": [
+              "Message",
+              "Text"
+            ],
+            "type": "str"
+          }
+        },
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "id": "reactflow__edge-LLM-extract-1{odataTypeo:oOpenAIModelo,oido:oLLM-extract-1o,onameo:omodel_outputo,ooutput_typeso:[oLanguageModelo]}-StructuredOutput-extract{ofieldNameo:omodelo,oido:oStructuredOutput-extracto,oinputTypeso:[oLanguageModelo],otypeo:oothero}",
+        "source": "LLM-extract-1",
+        "target": "StructuredOutput-extract",
+        "sourceHandle": "{odataTypeo: oOpenAIModelo, oido: oLLM-extract-1o, onameo: omodel_outputo, ooutput_typeso: [oLanguageModelo]}",
+        "targetHandle": "{ofieldNameo: omodelo, oido: oStructuredOutput-extracto, oinputTypeso: [oLanguageModelo], otypeo: oothero}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "OpenAIModel",
+            "id": "LLM-extract-1",
+            "name": "model_output",
+            "output_types": [
+              "LanguageModel"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "model",
+            "id": "StructuredOutput-extract",
+            "inputTypes": [
+              "LanguageModel"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "id": "reactflow__edge-StructuredOutput-extract{odataTypeo:oStructuredOutputo,oido:oStructuredOutput-extracto,onameo:odataframe_outputo,ooutput_typeso:[oTableo]}-SQLiteWriter-save{ofieldNameo:orowso,oido:oSQLiteWriter-saveo,oinputTypeso:[oDataFrameo,oTableo,oDatao,oJSONo],otypeo:oothero}",
+        "source": "StructuredOutput-extract",
+        "target": "SQLiteWriter-save",
+        "sourceHandle": "{odataTypeo: oStructuredOutputo, oido: oStructuredOutput-extracto, onameo: odataframe_outputo, ooutput_typeso: [oTableo]}",
+        "targetHandle": "{ofieldNameo: orowso, oido: oSQLiteWriter-saveo, oinputTypeso: [oDataFrameo, oTableo, oDatao, oJSONo], otypeo: oothero}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "StructuredOutput",
+            "id": "StructuredOutput-extract",
+            "name": "dataframe_output",
+            "output_types": [
+              "Table"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "rows",
+            "id": "SQLiteWriter-save",
+            "inputTypes": [
+              "DataFrame",
+              "Table",
+              "Data",
+              "JSON"
+            ],
+            "type": "other"
+          }
+        },
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "id": "reactflow__edge-SQLiteWriter-save{odataTypeo:oSQLiteDocuFlowWritero,oido:oSQLiteWriter-saveo,onameo:ostatus_messageo,ooutput_typeso:[oMessageo]}-ChatOutput-ingest{ofieldNameo:oinput_valueo,oido:oChatOutput-ingesto,oinputTypeso:[oMessageo,oTexto],otypeo:ostro}",
+        "source": "SQLiteWriter-save",
+        "target": "ChatOutput-ingest",
+        "sourceHandle": "{odataTypeo: oSQLiteDocuFlowWritero, oido: oSQLiteWriter-saveo, onameo: ostatus_messageo, ooutput_typeso: [oMessageo]}",
+        "targetHandle": "{ofieldNameo: oinput_valueo, oido: oChatOutput-ingesto, oinputTypeso: [oMessageo, oTexto], otypeo: ostro}",
+        "data": {
+          "sourceHandle": {
+            "dataType": "SQLiteDocuFlowWriter",
+            "id": "SQLiteWriter-save",
+            "name": "status_message",
+            "output_types": [
+              "Message"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "ChatOutput-ingest",
+            "inputTypes": [
+              "Message",
+              "Text"
+            ],
+            "type": "str"
+          }
+        },
+        "selected": false,
+        "animated": false,
+        "className": ""
       }
     ],
     "viewport": {
-      "x": 220.77770129252136,
-      "y": 286.20120531940245,
-      "zoom": 0.3052902707498331
+      "zoom": 0.6,
+      "x": 20,
+      "y": 20
     }
-  },
-  "description": "Upload invoice/kwitansi → ekstraksi LLM → validasi → simpan ke SQLite",
-  "endpoint_name": null,
-  "id": "20a3e812-b1bc-4604-a4dc-c707cb8e2c2d",
-  "is_component": false,
-  "last_tested_version": "1.9.2",
-  "locked": false,
-  "name": "Docuflow 1 - Ingestion Dokumen",
-  "tags": []
+  }
 }

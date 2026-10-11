@@ -1,0 +1,9 @@
+{
+  "python.defaultInterpreterPath": "C:\\Users\\ASUS\\AppData\\Local\\com.LangflowDesktop\\.langflow-venv\\Scripts\\python.exe",
+  "python.analysis.extraPaths": [
+    "C:\\Users\\ASUS\\AppData\\Local\\com.LangflowDesktop\\.langflow-venv\\Lib\\site-packages"
+  ],
+  "python.autoComplete.extraPaths": [
+    "C:\\Users\\ASUS\\AppData\\Local\\com.LangflowDesktop\\.langflow-venv\\Lib\\site-packages"
+  ]
+}

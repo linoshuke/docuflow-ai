@@ -11,7 +11,7 @@ from lfx.schema.message import Message
 
 class SQLiteDocuFlowWriter(Component):
     display_name = "DocuFlow SQLite Writer"
-    description = "Validasi hasil ekstraksi AI lalu simpan ke database SQLite."
+    description = "Validasi hasil ekstraksi AI lalu simpan ke database SQLite (lengkap dengan line items)."
     icon = "database"
     name = "SQLiteDocuFlowWriter"
 
@@ -25,7 +25,7 @@ class SQLiteDocuFlowWriter(Component):
         MessageTextInput(
             name="db_path",
             display_name="Path Database SQLite",
-            value=r"C:\Users\ASUS\docuflow-ai\data\docuflow.db",
+            value="",
             advanced=True,
         ),
     ]
@@ -46,6 +46,7 @@ class SQLiteDocuFlowWriter(Component):
         "total_amount": ["total_amount", "total", "grand_total", "total_dibayar", "jumlah_total", "amount"],
         "currency": ["currency", "mata_uang", "satuan_mata_uang"],
         "category": ["category", "kategori", "klasifikasi"],
+        "items": ["items", "line_items", "daftar_barang", "rincian", "detail_barang", "products", "rincian_barang"],
     }
 
     MONTHS_ID = {
@@ -58,6 +59,26 @@ class SQLiteDocuFlowWriter(Component):
         "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
         "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
     }
+
+    def _resolve_db_path(self, given_path):
+        if os.environ.get("DOCUFLOW_DB_PATH"):
+            return os.environ["DOCUFLOW_DB_PATH"]
+        p = str(given_path or "").strip()
+        if p and os.path.exists(os.path.dirname(p)):
+            return p
+        # Cari jalur database relatif secara otomatis
+        cwd = os.getcwd()
+        candidates = [
+            os.path.join(cwd, "data", "docuflow.db"),
+            os.path.join(os.path.dirname(__file__) if "__file__" in globals() else cwd, "..", "data", "docuflow.db"),
+            r"C:\Users\ASUS\docuflow-ai\data\docuflow.db",
+            os.path.join(cwd, "docuflow.db"),
+        ]
+        for c in candidates:
+            c_abs = os.path.abspath(c)
+            if os.path.exists(os.path.dirname(c_abs)):
+                return c_abs
+        return os.path.abspath(os.path.join(cwd, "data", "docuflow.db"))
 
     def _row_to_dict(self, item):
         if isinstance(item, dict):
@@ -133,6 +154,50 @@ class SQLiteDocuFlowWriter(Component):
                 continue
         return None, f"format tanggal '{raw}' tidak dikenali"
 
+    def _parse_items(self, raw_items):
+        if not raw_items:
+            return []
+        if isinstance(raw_items, str):
+            try:
+                raw_items = json.loads(raw_items)
+            except Exception:
+                return []
+        if not isinstance(raw_items, list):
+            if isinstance(raw_items, dict):
+                raw_items = [raw_items]
+            else:
+                return []
+
+        parsed = []
+        for it in raw_items:
+            if not isinstance(it, dict):
+                continue
+            name = it.get("item_name") or it.get("name") or it.get("nama_barang") or it.get("deskripsi") or it.get("description")
+            if not name:
+                continue
+            qty = self._parse_amount(it.get("quantity") or it.get("qty") or it.get("jumlah") or 1)
+            unit_p = self._parse_amount(it.get("unit_price") or it.get("price") or it.get("harga_satuan") or it.get("harga"))
+            tot_p = self._parse_amount(it.get("total_price") or it.get("subtotal") or it.get("total") or it.get("jumlah_harga"))
+
+            if tot_p is None and qty is not None and unit_p is not None:
+                tot_p = qty * unit_p
+            elif unit_p is None and qty and tot_p:
+                unit_p = tot_p / qty
+
+            parsed.append({
+                "item_name": str(name).strip(),
+                "quantity": qty or 1.0,
+                "unit_price": unit_p or 0.0,
+                "total_price": tot_p or 0.0,
+            })
+        return parsed
+
+    def _normalize_str(self, s):
+        if not s:
+            return ""
+        # Bersihkan spasi, tanda baca untuk pencocokan toleran
+        return re.sub(r"[^\w]", "", str(s).lower())
+
     def _validate_and_normalize(self, row):
         record, warnings = {}, []
         for key, val in row.items():
@@ -142,12 +207,14 @@ class SQLiteDocuFlowWriter(Component):
         for field in ("doc_type", "vendor", "document_number", "description", "currency", "category"):
             v = record.get(field)
             record[field] = str(v).strip() if v is not None and str(v).strip().lower() != "null" else None
+
         date_val, date_warn = self._parse_date(record.get("document_date"))
         if date_warn:
             record["document_date"] = str(record.get("document_date"))
             warnings.append(date_warn)
         else:
             record["document_date"] = date_val
+
         for field in ("subtotal", "tax", "total_amount"):
             num = self._parse_amount(record.get(field))
             if record.get(field) is not None and num is None:
@@ -155,25 +222,58 @@ class SQLiteDocuFlowWriter(Component):
             record[field] = num
             if num is not None and num < 0:
                 warnings.append(f"{field} bernilai negatif")
+
+        # Parse Line Items
+        line_items = self._parse_items(record.get("items"))
+        record["_items"] = line_items
+
+        # Fallback jika total_amount kosong namun ada line items
+        if record.get("total_amount") is None and line_items:
+            sum_items = sum(it["total_price"] for it in line_items if it.get("total_price"))
+            if sum_items > 0:
+                record["total_amount"] = sum_items
+                if record.get("subtotal") is None:
+                    record["subtotal"] = sum_items
+
         if record.get("currency") is None and any(
             record.get(f) is not None for f in ("subtotal", "tax", "total_amount")
         ):
             record["currency"] = "IDR"
+
         if not any([record.get("vendor"), record.get("document_number"),
                     record.get("total_amount") is not None]):
             return None, ["baris kosong / tanpa informasi penting"], ""
         return record, warnings, json.dumps(row, ensure_ascii=False, default=str)
 
     def _is_duplicate(self, cur, rec):
-        cur.execute(
-            "SELECT COUNT(*) FROM documents WHERE IFNULL(doc_type,'')=IFNULL(?,'') "
-            "AND IFNULL(document_number,'')=IFNULL(?,'') AND IFNULL(vendor,'')=IFNULL(?,'')",
-            (rec.get("doc_type"), rec.get("document_number"), rec.get("vendor")),
-        )
-        return cur.fetchone()[0] > 0
+        vendor_norm = self._normalize_str(rec.get("vendor"))
+        doc_no = (rec.get("document_number") or "").strip()
+        doc_date = (rec.get("document_date") or "").strip()
+        total = rec.get("total_amount")
+
+        # Jika nomor dokumen ada dan bermakna: periksa nomor + normalisasi vendor
+        if doc_no and len(doc_no) >= 3:
+            cur.execute("SELECT id, vendor, document_number FROM documents WHERE document_number = ?", (doc_no,))
+            rows = cur.fetchall()
+            for _, v, _ in rows:
+                if not vendor_norm or not v or self._normalize_str(v) == vendor_norm:
+                    return True
+
+        # Jika nomor dokumen tidak ada: HANYA anggap duplikat jika vendor, tanggal, DAN total cocok persis
+        if vendor_norm and doc_date and total is not None:
+            cur.execute(
+                "SELECT id, vendor, document_date, total_amount FROM documents WHERE document_date = ? AND ABS(total_amount - ?) < 0.01",
+                (doc_date, total)
+            )
+            rows = cur.fetchall()
+            for _, v, _, _ in rows:
+                if self._normalize_str(v) == vendor_norm:
+                    return True
+
+        return False
 
     def write_rows(self) -> Message:
-        db_path = str(self.db_path or "").strip() or r"C:\Users\ASUS\docuflow-ai\data\docuflow.db"
+        db_path = self._resolve_db_path(self.db_path)
         items = self.rows
         if hasattr(items, "value") and not hasattr(items, "__iter__"):
             items = [items]
@@ -216,6 +316,8 @@ class SQLiteDocuFlowWriter(Component):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         conn = sqlite3.connect(db_path)
         cur = conn.cursor()
+
+        # Buat tabel documents dan document_items
         cur.execute(
             """CREATE TABLE IF NOT EXISTS documents (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -227,12 +329,28 @@ class SQLiteDocuFlowWriter(Component):
                 created_at TEXT DEFAULT (datetime('now','localtime'))
             )"""
         )
+        cur.execute(
+            """CREATE TABLE IF NOT EXISTS document_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                document_id INTEGER,
+                item_name TEXT,
+                quantity REAL,
+                unit_price REAL,
+                total_price REAL,
+                created_at TEXT DEFAULT (datetime('now','localtime')),
+                FOREIGN KEY (document_id) REFERENCES documents (id) ON DELETE CASCADE
+            )"""
+        )
+
         saved, duplicates = [], []
         for rec in records:
             raw = rec.pop("_raw", None)
+            line_items = rec.pop("_items", [])
+
             if self._is_duplicate(cur, rec):
                 duplicates.append(rec.get("document_number") or rec.get("vendor") or "tanpa nomor")
                 continue
+
             cur.execute(
                 """INSERT INTO documents (doc_type, vendor, document_number, document_date,
                    description, subtotal, tax, total_amount, currency, category, warnings, raw_json)
@@ -242,10 +360,24 @@ class SQLiteDocuFlowWriter(Component):
                     rec.get("document_date"), rec.get("description"),
                     rec.get("subtotal"), rec.get("tax"), rec.get("total_amount"),
                     rec.get("currency"), rec.get("category"),
-                    "; ".join(warns) if warns else None, raw,
+                    "; ".join(all_warnings) if all_warnings else None, raw,
                 ),
             )
+            doc_id = cur.lastrowid
+
+            # Simpan rincian barang/jasa (line items)
+            if line_items:
+                cur.executemany(
+                    """INSERT INTO document_items (document_id, item_name, quantity, unit_price, total_price)
+                       VALUES (?, ?, ?, ?, ?)""",
+                    [(doc_id, it["item_name"], it["quantity"], it["unit_price"], it["total_price"])
+                     for it in line_items]
+                )
+
+            rec["id"] = doc_id
+            rec["items_count"] = len(line_items)
             saved.append(rec)
+
         conn.commit()
         last_id = cur.lastrowid
         conn.close()
@@ -256,10 +388,11 @@ class SQLiteDocuFlowWriter(Component):
             for i, r in enumerate(saved, 1):
                 total = f"{r['total_amount']:,.2f} {r.get('currency') or ''}".strip() \
                     if r.get("total_amount") is not None else "n/a"
+                items_info = f" ({r['items_count']} rincian item)" if r.get("items_count") else ""
                 lines.append(
                     f"[{i}] {r.get('doc_type') or '-'} | {r.get('vendor') or '-'} | "
                     f"No: {r.get('document_number') or '-'} | Tgl: {r.get('document_date') or '-'} | "
-                    f"Total: {total}"
+                    f"Total: {total}{items_info}"
                 )
         if duplicates:
             lines.append(f"DILEWATI (duplikat): {len(duplicates)} -> {', '.join(duplicates)}")
